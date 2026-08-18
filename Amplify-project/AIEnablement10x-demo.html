@@ -1,0 +1,2043 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Amplify</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.4/babel.min.js"></script>
+<style>
+:root {
+  --ink: #1a1f36;
+  --ink-soft: #5a6178;
+  --line: #e4e7f0;
+  --paper: #f7f8fb;
+  --card: #ffffff;
+  --accent: #3d5af1;
+  --accent-soft: #eaeefe;
+  --green: #17a673;
+  --green-soft: #e2f6ee;
+  --amber: #d99a06;
+  --amber-soft: #fdf3d7;
+  --red: #d64550;
+  --red-soft: #fdeaec;
+  --purple: #7b5cf0;
+  --dark-bg: #0b0d1e;
+  --dark-card: #151833;
+  --dark-line: #2b2f55;
+  --dark-text: #e8eaf6;
+  --dark-muted: #8b90b5;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+.app-dark { background: var(--dark-bg); color: var(--dark-text); }
+.app-light { background: var(--paper); color: var(--ink); }
+
+/* ---------- Top nav ---------- */
+.topnav {
+  display: flex; align-items: center; gap: 20px;
+  padding: 10px 22px;
+  background: #0e1130;
+  color: #fff;
+  position: sticky; top: 0; z-index: 50;
+}
+.topnav-brand { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.brand-mark {
+  background: linear-gradient(135deg, #5b6cff, #a45bf0);
+  font-weight: 800; font-size: 12px; padding: 5px 8px; border-radius: 7px;
+  letter-spacing: 0.5px;
+}
+.brand-name { font-weight: 700; font-size: 14px; white-space: nowrap; }
+.topnav-links { display: flex; gap: 2px; flex: 1; overflow-x: auto; }
+.topnav-link {
+  background: none; border: none; color: #a3a9d6; font: inherit; font-size: 12.5px;
+  padding: 7px 11px; border-radius: 7px; cursor: pointer; white-space: nowrap;
+}
+.topnav-link:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.topnav-link.active { color: #fff; background: rgba(91,108,255,0.35); font-weight: 600; }
+.topnav-user { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.user-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: linear-gradient(135deg, #35c3a9, #3d5af1);
+  display: flex; align-items: center; justify-content: center; font-weight: 700;
+}
+.user-name { color: #c9cdf0; white-space: nowrap; }
+.user-badge {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 1px;
+  background: #35c3a9; color: #06251d; padding: 3px 7px; border-radius: 20px;
+}
+
+.page { flex: 1; }
+
+/* ---------- Shared light-page chrome ---------- */
+.light-shell { display: flex; min-height: calc(100vh - 46px); }
+.sidebar {
+  width: 220px; flex-shrink: 0; border-right: 1px solid var(--line);
+  background: var(--card); padding: 20px 14px;
+}
+.sidebar-title { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
+.sidebar-logo {
+  width: 30px; height: 30px; border-radius: 8px; color: #fff; font-weight: 800; font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #3d5af1, #7b5cf0);
+}
+.sidebar-title h2 { font-size: 13.5px; }
+.sidebar-sub { font-size: 10.5px; color: var(--ink-soft); margin: 2px 0 20px 39px; }
+.sidebar-section { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--ink-soft); margin: 18px 0 6px; }
+.sidebar-item {
+  display: block; width: 100%; text-align: left; background: none; border: none;
+  font: inherit; font-size: 13px; color: var(--ink); padding: 8px 10px;
+  border-radius: 8px; cursor: pointer;
+}
+.sidebar-item:hover { background: var(--paper); }
+.sidebar-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.sidebar-footer { margin-top: 30px; font-size: 11.5px; color: var(--ink-soft); }
+.sidebar-footer a { display: block; color: var(--ink-soft); text-decoration: none; padding: 3px 0; cursor: pointer; }
+.sidebar-footer a:hover { color: var(--accent); }
+
+.content { flex: 1; padding: 26px 32px; max-width: 1200px; }
+.content h1 { font-size: 21px; margin-bottom: 4px; }
+.content-sub { color: var(--ink-soft); font-size: 13px; margin-bottom: 22px; }
+
+/* ---------- Cards, chips, buttons ---------- */
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+.btn {
+  border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  font: inherit; font-size: 12.5px; font-weight: 600; padding: 8px 14px;
+  border-radius: 8px; cursor: pointer;
+}
+.btn:hover { border-color: #c8cde0; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { background: #2f49d1; }
+.btn-danger-ghost { color: var(--red); border-color: #f0c6ca; }
+.btn-sm { padding: 5px 10px; font-size: 11.5px; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px;
+}
+.chip-green { background: var(--green-soft); color: var(--green); }
+.chip-amber { background: var(--amber-soft); color: var(--amber); }
+.chip-grey { background: #eef0f6; color: var(--ink-soft); }
+.chip-purple { background: #f0ebfd; color: var(--purple); }
+.chip-red { background: var(--red-soft); color: var(--red); }
+
+/* ---------- Landing ---------- */
+.landing {
+  min-height: calc(100vh - 46px);
+  background:
+    radial-gradient(ellipse 60% 45% at 25% 85%, rgba(214,69,80,0.28), transparent),
+    radial-gradient(ellipse 55% 45% at 78% 80%, rgba(123,92,240,0.4), transparent),
+    radial-gradient(ellipse 70% 55% at 50% 25%, rgba(61,90,241,0.25), transparent),
+    #0b0d24;
+  color: #fff; padding: 48px 30px 60px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.landing h1 { font-size: 46px; font-weight: 600; margin-bottom: 14px; }
+.landing-kicker { font-size: 12px; font-weight: 700; letter-spacing: 3px; color: #9aa8f5; margin-bottom: 34px; }
+.signal-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 60px; }
+.signal-pill {
+  border: 1px solid rgba(255,255,255,0.35); border-radius: 12px;
+  padding: 13px 34px; font-weight: 700; font-size: 14.5px;
+  background: rgba(255,255,255,0.04); backdrop-filter: blur(4px);
+}
+.layer-row { display: flex; gap: 26px; justify-content: center; flex-wrap: wrap; }
+.layer-card {
+  width: 265px; text-align: left; border-radius: 18px; padding: 26px 22px;
+  background: rgba(8,10,30,0.75);
+  border: 1px solid rgba(123,92,240,0.55);
+  box-shadow: 0 0 40px rgba(123,92,240,0.25);
+  cursor: pointer; transition: transform .15s ease, box-shadow .15s ease;
+}
+.layer-card:hover { transform: translateY(-4px); box-shadow: 0 0 55px rgba(123,92,240,0.45); }
+.layer-card.pulse-card { border-color: rgba(214,69,80,0.6); box-shadow: 0 0 40px rgba(214,69,80,0.2); }
+.layer-icon { font-size: 34px; margin-bottom: 16px; }
+.layer-card h3 { font-size: 17px; margin-bottom: 8px; }
+.layer-tag { font-size: 10.5px; font-weight: 700; letter-spacing: 1.6px; color: #9aa8f5; margin-bottom: 12px; }
+.layer-card p { font-size: 13px; line-height: 1.55; color: #c5c9e8; }
+.landing-hint { margin-top: 44px; font-size: 12.5px; color: #8b90b5; }
+.arch-flow {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  margin-top: 46px; flex-wrap: wrap;
+}
+.arch-node {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  border: 1px solid rgba(154,168,245,0.4); border-radius: 10px;
+  padding: 12px 20px; font-size: 13.5px; font-weight: 700; color: #e8eaf6;
+  background: rgba(255,255,255,0.03);
+}
+.arch-node small { font-size: 10px; font-weight: 500; color: #9aa8f5; letter-spacing: 0.3px; }
+.arch-node-accent { border-color: rgba(123,92,240,0.7); box-shadow: 0 0 22px rgba(123,92,240,0.3); }
+.arch-arrow { font-size: 18px; color: #6d7098; }
+
+/* ---------- Security Pulse ---------- */
+.context-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+.context-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  padding: 13px 14px; cursor: pointer; text-align: left; font: inherit;
+}
+.context-card .cc-icon { font-size: 15px; margin-bottom: 7px; display: block; }
+.context-card h4 { font-size: 12.5px; margin-bottom: 4px; }
+.context-card p { font-size: 10.5px; color: var(--ink-soft); line-height: 1.45; }
+.context-card.selected { background: var(--accent); border-color: var(--accent); }
+.context-card.selected h4, .context-card.selected p, .context-card.selected .cc-icon { color: #fff; }
+
+.tab-row { display: inline-flex; background: #eef0f6; border-radius: 9px; padding: 3px; margin-bottom: 18px; }
+.tab-row button {
+  border: none; background: none; font: inherit; font-size: 12.5px; font-weight: 600;
+  padding: 7px 16px; border-radius: 7px; cursor: pointer; color: var(--ink-soft);
+}
+.tab-row button.active { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(20,25,60,0.12); }
+
+.pulse-grid { display: grid; grid-template-columns: 1fr 300px; gap: 18px; align-items: start; }
+
+.scatter-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.scatter-head h3 { font-size: 14.5px; }
+.scatter-sub { font-size: 11.5px; color: var(--ink-soft); margin-bottom: 14px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button {
+  border: none; background: var(--card); font: inherit; font-size: 11.5px; font-weight: 600;
+  padding: 6px 12px; cursor: pointer; color: var(--ink-soft);
+}
+.seg button.active { background: var(--ink); color: #fff; }
+
+.quad-legend { display: flex; flex-direction: column; gap: 12px; }
+.quad-item { display: flex; gap: 9px; font-size: 11px; color: var(--ink-soft); line-height: 1.45; }
+.quad-dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 3px; flex-shrink: 0; }
+.quad-item b { color: var(--ink); font-size: 11.5px; }
+.analyst-note {
+  margin-top: 16px; background: #f0ebfd; border: 1px solid #ddd2f8; border-radius: 10px;
+  padding: 13px; font-size: 11.5px; line-height: 1.55; color: #4a3d80;
+}
+.analyst-note h5 { font-size: 10px; letter-spacing: 1.2px; margin-bottom: 7px; color: var(--purple); }
+
+/* risk matrix */
+.matrix-controls { display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 12px; }
+.matrix-controls label { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--ink-soft); align-self: center; }
+.matrix-controls select {
+  font: inherit; font-size: 12px; padding: 6px 8px; border-radius: 7px;
+  border: 1px solid var(--line); background: var(--card);
+}
+table.matrix { width: 100%; border-collapse: separate; border-spacing: 4px 4px; }
+table.matrix th {
+  font-size: 10.5px; letter-spacing: 0.8px; color: var(--ink-soft); font-weight: 700;
+  text-align: center; padding: 6px 4px; text-transform: uppercase;
+}
+table.matrix th.rowhead { text-align: left; }
+table.matrix td { padding: 0; }
+table.matrix td.rowlabel { font-size: 12.5px; font-weight: 600; padding-right: 10px; white-space: nowrap; }
+table.matrix td.rowlabel span { font-weight: 400; font-size: 10.5px; color: var(--ink-soft); margin-left: 6px; }
+.heat {
+  display: block; text-align: center; font-size: 12.5px; font-weight: 600;
+  padding: 10px 0; border-radius: 7px; border: 1px solid rgba(0,0,0,0.06);
+}
+
+/* ---------- Admin catalog ---------- */
+.catalog-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.filter-pill {
+  border: 1px solid var(--line); background: var(--card); font: inherit; font-size: 11.5px;
+  font-weight: 600; padding: 5px 12px; border-radius: 20px; cursor: pointer; color: var(--ink-soft);
+}
+.filter-pill.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+.filter-gap { width: 14px; }
+.module-row {
+  display: flex; justify-content: space-between; align-items: center; gap: 14px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 11px;
+  padding: 14px 16px; margin-bottom: 10px;
+}
+.module-info h4 { font-size: 13.5px; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.module-meta { font-size: 11px; color: var(--ink-soft); margin-bottom: 4px; }
+.module-meta code {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; background: #eef0f6;
+  padding: 2px 6px; border-radius: 5px; margin-right: 8px;
+}
+.module-desc { font-size: 11.5px; color: var(--ink-soft); }
+.module-actions { display: flex; gap: 7px; flex-shrink: 0; }
+
+/* ---------- Orchestrator ---------- */
+.orch-grid { display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: start; }
+.orch-step { margin-bottom: 16px; }
+.orch-step h4 { font-size: 10.5px; letter-spacing: 1.3px; color: var(--ink-soft); margin-bottom: 10px; }
+.orch-step textarea {
+  width: 100%; font: inherit; font-size: 12px; padding: 10px; border-radius: 9px;
+  border: 1px solid var(--line); resize: vertical; min-height: 74px;
+  font-family: 'JetBrains Mono', monospace; color: var(--accent);
+}
+.pill-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.pill-row .filter-pill.small { font-size: 11px; padding: 4px 11px; }
+.format-opt {
+  display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line);
+  border-radius: 10px; padding: 11px 12px; margin-bottom: 8px; cursor: pointer;
+  background: var(--card);
+}
+.format-opt.checked { border-color: var(--accent); background: var(--accent-soft); }
+.format-opt input { margin-top: 3px; }
+.format-opt h5 { font-size: 12.5px; margin-bottom: 3px; }
+.format-opt p { font-size: 11px; color: var(--ink-soft); line-height: 1.45; }
+.empty-state { text-align: center; color: var(--ink-soft); padding: 90px 20px; font-size: 12.5px; }
+.empty-state .es-icon { font-size: 30px; margin-bottom: 12px; opacity: 0.5; }
+.gen-result { margin-bottom: 14px; }
+.gen-result-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.gen-result-head h4 { font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.gen-quote {
+  border-left: 3px solid var(--line); padding: 8px 12px; font-size: 12px;
+  color: var(--ink-soft); font-style: italic; margin-bottom: 10px; line-height: 1.5;
+}
+.gen-url {
+  display: flex; gap: 8px; margin-bottom: 10px;
+}
+.gen-url code {
+  flex: 1; font-family: 'JetBrains Mono', monospace; font-size: 10px; background: #eef0f6;
+  padding: 8px 10px; border-radius: 7px; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; color: var(--ink-soft);
+}
+.big-cta { display: block; width: 100%; text-align: center; margin-bottom: 8px; padding: 11px; font-size: 13px; }
+.spin {
+  width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
+  border-radius: 50%; display: inline-block; vertical-align: -3px; margin-right: 8px;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.inferred-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+
+/* ---------- Command centre ---------- */
+.wizard-steps { display: flex; gap: 8px; margin-bottom: 24px; }
+.wstep {
+  flex: 1; text-align: center; font-size: 12.5px; font-weight: 600; padding: 10px;
+  border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--ink-soft);
+}
+.wstep.done { background: var(--green-soft); border-color: #bfe8d8; color: var(--green); }
+.wstep.current { background: #e7ebfd; border-color: #c3cdf8; color: var(--accent); }
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.field .hint { font-size: 11px; color: var(--ink-soft); font-weight: 400; margin-bottom: 6px; }
+.field input[type='text'], .field input[type='email'] {
+  width: 100%; font: inherit; font-size: 13px; padding: 10px 12px;
+  border-radius: 9px; border: 1px solid var(--line);
+}
+.audience-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.wizard-nav { display: flex; justify-content: space-between; margin-top: 22px; }
+.compose-toolbar {
+  display: flex; gap: 4px; border: 1px solid var(--line); border-bottom: none;
+  border-radius: 9px 9px 0 0; padding: 7px 9px; background: #fafbfe;
+}
+.compose-toolbar span {
+  font-size: 11px; font-weight: 700; color: var(--ink-soft); padding: 3px 7px;
+  border-radius: 5px; cursor: default;
+}
+.compose-body {
+  border: 1px solid var(--line); border-radius: 0 0 9px 9px; padding: 14px;
+  font-size: 13px; line-height: 1.65; background: var(--card);
+}
+.compose-img {
+  margin-top: 12px; border-radius: 9px; height: 130px;
+  background: linear-gradient(140deg, #0d2136, #14496b 55%, #d97b28);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 12px; letter-spacing: 1px; font-weight: 600;
+}
+.stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--card); border: 1px solid var(--line); border-radius: 11px; padding: 18px; text-align: center; }
+.stat-card .num { font-size: 26px; font-weight: 700; }
+.stat-card .num.green { color: var(--green); }
+.stat-card .lbl { font-size: 10px; letter-spacing: 1.2px; color: var(--ink-soft); font-weight: 700; margin-top: 5px; }
+.donut-wrap { display: flex; gap: 24px; align-items: center; }
+.campaign-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 30px; font-size: 12px; }
+.campaign-info-grid div { color: var(--ink-soft); }
+.campaign-info-grid b { color: var(--ink); font-weight: 600; }
+
+/* ---------- Teams mock ---------- */
+.teams { display: flex; min-height: calc(100vh - 46px); background: #f5f5f5; color: #242424; }
+.teams-rail {
+  width: 68px; background: #2b2b3d; padding: 14px 0; display: flex; flex-direction: column;
+  align-items: center; gap: 6px; font-size: 10px; color: #c8c6d4;
+}
+.teams-rail .rail-logo {
+  width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg, #6264a7, #464775);
+  display: flex; align-items: center; justify-content: center; font-size: 15px; margin-bottom: 14px; color: #fff;
+}
+.rail-item { text-align: center; cursor: default; padding: 7px 8px; border-radius: 6px; width: 52px; }
+.rail-item.active { background: rgba(255,255,255,0.09); color: #fff; }
+.rail-item .ri-icon { font-size: 17px; display: block; margin-bottom: 3px; }
+.teams-sidebar { width: 260px; background: #faf9f8; border-right: 1px solid #e1dfdd; padding: 14px 0; font-size: 13.5px; }
+.teams-ws { font-weight: 800; font-size: 17px; padding: 0 16px 14px; color: #242424; }
+.teams-section { padding: 4px 16px; color: #616161; font-size: 11.5px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; margin-top: 14px; }
+.teams-chan { padding: 5px 16px 5px 24px; cursor: default; color: #424242; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.teams-chan.active { background: #e1dfea; color: #242424; border-left: 3px solid #6264a7; padding-left: 21px; font-weight: 600; }
+.teams-main { flex: 1; display: flex; flex-direction: column; background: #fff; }
+.teams-header {
+  padding: 12px 20px; border-bottom: 1px solid #e1dfdd; font-weight: 700; color: #242424;
+  display: flex; align-items: center; gap: 8px; font-size: 15px;
+}
+.teams-msgs { flex: 1; padding: 22px 26px; }
+.teams-day {
+  text-align: center; font-size: 11.5px; font-weight: 700; color: #616161;
+  border-bottom: 1px solid #e1dfdd; line-height: 0.1; margin: 10px 0 26px;
+}
+.teams-day span { background: #fff; padding: 0 12px; }
+.teams-msg { display: flex; gap: 10px; }
+.teams-avatar {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, #6264a7, #464775);
+  display: flex; align-items: center; justify-content: center; font-size: 19px; color: #fff;
+}
+.teams-msg-head { display: flex; align-items: baseline; gap: 7px; margin-bottom: 4px; }
+.teams-msg-head b { color: #242424; font-size: 14px; }
+.teams-app-badge { font-size: 9px; font-weight: 700; background: #f0eefa; color: #6264a7; padding: 2px 5px; border-radius: 3px; }
+.teams-time { font-size: 11px; color: #8a8886; }
+.teams-bubble {
+  background: #f5f5f5; border-radius: 0 8px 8px 8px; padding: 12px 14px;
+  font-size: 13.5px; line-height: 1.6; max-width: 620px; color: #242424;
+}
+.teams-bubble a { color: #6264a7; text-decoration: none; cursor: pointer; font-weight: 600; }
+.teams-bubble a:hover { text-decoration: underline; }
+.teams-img {
+  margin-top: 12px; width: 420px; height: 200px; border-radius: 10px;
+  background: linear-gradient(140deg, #2b2b3d, #464775 55%, #6264a7);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 12px; letter-spacing: 1px; font-weight: 600;
+}
+.teams-composer {
+  margin: 0 26px 24px; border: 1px solid #e1dfdd; border-radius: 10px; padding: 11px 14px;
+  color: #8a8886; font-size: 13.5px; background: #fff;
+}
+
+/* ---------- Cipher Letter simulation ---------- */
+.sim-shell { max-width: 900px; margin: 0 auto; padding: 26px 20px 60px; }
+.sim-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.sim-topbar h2 { font-size: 15px; display: flex; gap: 10px; align-items: center; }
+.attack-banner {
+  background: var(--red); color: #fff; font-weight: 700; text-align: center;
+  border-radius: 10px; padding: 13px; margin-bottom: 18px; font-size: 14.5px;
+}
+.mail-window {
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: 0 10px 34px rgba(20,25,60,0.10); overflow: hidden;
+}
+.mail-chrome { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.mail-logo { font-weight: 800; color: var(--purple); font-size: 15px; }
+.mail-search {
+  flex: 1; background: var(--paper); border-radius: 7px; padding: 7px 12px;
+  font-size: 12px; color: var(--ink-soft);
+}
+.mail-body { display: flex; }
+.mail-nav { width: 150px; border-right: 1px solid var(--line); padding: 14px 0; font-size: 12.5px; }
+.mail-nav div { padding: 6px 16px; color: var(--ink-soft); display: flex; justify-content: space-between; }
+.mail-nav div.active { color: var(--accent); font-weight: 700; background: var(--accent-soft); }
+.mail-content { flex: 1; padding: 20px 24px; }
+.mail-content h3 { font-size: 16.5px; margin-bottom: 14px; }
+.mail-from { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; }
+.mail-from-avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: #1e6e54; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
+}
+.mail-from b { font-size: 13px; display: block; }
+.mail-from-addr {
+  font-size: 11px; color: var(--ink-soft); background: #eef0f6; border-radius: 5px;
+  padding: 2px 7px; display: inline-block; margin-top: 3px;
+}
+.mail-date { margin-left: auto; font-size: 11.5px; color: var(--ink-soft); }
+.mail-text { font-size: 13px; line-height: 1.7; color: #333a52; margin-bottom: 20px; }
+.mail-text code { font-family: 'JetBrains Mono', monospace; background: #eef0f6; padding: 1px 6px; border-radius: 4px; }
+.choice {
+  display: flex; gap: 12px; align-items: center; width: 100%; text-align: left;
+  border: 1px solid var(--line); background: var(--card); border-radius: 10px;
+  padding: 13px 15px; margin-bottom: 9px; font: inherit; font-size: 13px; cursor: pointer;
+}
+.choice:hover { border-color: var(--accent); background: var(--accent-soft); }
+.choice .key {
+  width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700;
+  flex-shrink: 0; background: var(--paper);
+}
+.choice.picked-good { border-color: var(--green); background: var(--green-soft); }
+.choice.picked-bad { border-color: var(--red); background: var(--red-soft); }
+.sim-actions { display: flex; gap: 10px; justify-content: center; padding: 18px; border-top: 1px solid var(--line); }
+.coach-box {
+  margin: 0 18px 18px; border: 1px solid #d8dcf8; background: #f3f5fe; border-radius: 10px; padding: 14px 16px;
+}
+.coach-box h5 { font-size: 10.5px; letter-spacing: 1.2px; color: var(--accent); margin-bottom: 7px; }
+.coach-box p { font-size: 12.5px; line-height: 1.6; color: #3c4370; }
+.coach-rate { margin-top: 9px; display: flex; gap: 7px; }
+
+.redflags { display: grid; grid-template-columns: 1fr 340px; gap: 18px; margin-top: 18px; align-items: start; }
+.flag-item {
+  display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line);
+  border-radius: 10px; padding: 11px 13px; margin-bottom: 8px; cursor: pointer; font-size: 12.5px;
+  background: var(--card);
+}
+.flag-item.ticked { border-color: var(--red); background: var(--red-soft); }
+.flag-item input { margin-top: 2px; }
+
+.persona-quad { max-width: 620px; margin: 26px auto; text-align: center; }
+.persona-grid {
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 150px 150px;
+  gap: 4px; position: relative; margin: 18px 0 8px;
+}
+.pq-cell { border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 5px; font-size: 12.5px; font-weight: 700; }
+.pq-cell span { font-size: 24px; }
+.pq-you {
+  position: absolute; width: 46px; height: 46px; border-radius: 50%;
+  background: var(--red); color: #fff; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; border: 3px solid #fff; box-shadow: 0 4px 14px rgba(214,69,80,0.5);
+}
+.pq-axis { font-size: 10.5px; color: var(--ink-soft); display: flex; justify-content: space-between; padding: 0 20px; }
+.persona-result {
+  margin-top: 18px; background: var(--card); border: 1px solid var(--line);
+  border-radius: 12px; padding: 18px; text-align: left; font-size: 13px; line-height: 1.6;
+}
+
+/* ---------- Amplifyverse ---------- */
+.amplify-shell { display: flex; min-height: calc(100vh - 46px); }
+.amplify-side { width: 215px; background: #0d1028; border-right: 1px solid var(--dark-line); padding: 20px 14px; }
+.amplify-side .as-brand { color: #f2b64c; font-weight: 800; font-size: 12.5px; letter-spacing: 1.5px; margin-bottom: 22px; }
+.amplify-side .sidebar-section { color: #5c6191; }
+.amplify-item {
+  display: block; width: 100%; text-align: left; background: none; border: none; font: inherit;
+  font-size: 13px; color: #b7bce0; padding: 8px 10px; border-radius: 8px; cursor: pointer;
+}
+.amplify-item:hover { background: rgba(255,255,255,0.06); }
+.amplify-item.active { background: rgba(53,195,169,0.18); color: #35c3a9; font-weight: 600; }
+.amplify-main { flex: 1; padding: 26px 32px; position: relative; }
+.welcome-hero {
+  background: linear-gradient(120deg, rgba(53,195,169,0.85), rgba(23,97,131,0.75));
+  border-radius: 14px; padding: 26px 28px; margin-bottom: 26px; color: #fff;
+}
+.welcome-hero h1 { font-size: 22px; margin-bottom: 8px; }
+.welcome-hero p { font-size: 13px; opacity: 0.9; max-width: 560px; line-height: 1.55; }
+.avail-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.avail-head h4 { font-size: 10.5px; letter-spacing: 1.5px; color: var(--dark-muted); }
+.avail-head span { font-size: 11.5px; color: var(--dark-muted); }
+.collection-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.ctab {
+  border: 1px solid var(--dark-line); background: none; color: var(--dark-muted); font: inherit;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; padding: 6px 13px;
+  border-radius: 20px; cursor: pointer;
+}
+.ctab.active { background: #35c3a9; border-color: #35c3a9; color: #04211a; }
+.mod-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.mod-card { background: var(--dark-card); border: 1px solid var(--dark-line); border-radius: 12px; padding: 16px; }
+.mod-card .tag { font-size: 9.5px; font-weight: 800; letter-spacing: 1.4px; color: #35c3a9; margin-bottom: 9px; display: block; }
+.mod-card h4 { font-size: 14px; margin-bottom: 7px; color: #fff; }
+.mod-card p { font-size: 11.5px; color: var(--dark-muted); line-height: 1.5; margin-bottom: 14px; }
+.mod-card-foot { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--dark-muted); }
+.mod-card-foot button { background: none; border: none; color: #35c3a9; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.galaxy-toggle { position: absolute; top: 26px; right: 32px; display: flex; gap: 8px; align-items: center; }
+
+.galaxy {
+  position: relative; height: calc(100vh - 46px); overflow: hidden;
+  background: radial-gradient(ellipse at 60% 40%, #191d3f 0%, #0b0d1e 60%, #06070f 100%);
+}
+.star { position: absolute; border-radius: 50%; background: #cdd3ff; }
+.galaxy-hud {
+  position: absolute; top: 0; left: 0; right: 0; padding: 14px 24px;
+  display: flex; align-items: center; gap: 22px; z-index: 5;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1.5px;
+}
+.galaxy-hud .hud-brand { color: #f2994a; font-weight: 700; }
+.galaxy-hud .hud-tab { color: #6d7098; cursor: default; }
+.galaxy-hud .hud-tab.on { color: #e8eaf6; background: rgba(255,255,255,0.08); padding: 4px 10px; border-radius: 5px; }
+.galaxy-hud .hud-xp { margin-left: auto; color: #f2b64c; font-weight: 700; }
+.planet-wrap { position: absolute; text-align: center; cursor: pointer; z-index: 4; }
+.planet { border-radius: 50%; margin: 0 auto; position: relative; }
+.planet-ring {
+  position: absolute; inset: -14px; border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 50%;
+}
+.planet-label {
+  margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px;
+  letter-spacing: 2px; font-weight: 700;
+}
+.mission-panel {
+  position: absolute; top: 70px; right: 40px; width: 300px; z-index: 6;
+  border: 1px solid rgba(242,182,76,0.5); background: rgba(10,10,22,0.88);
+  border-radius: 4px; padding: 20px; font-family: 'JetBrains Mono', monospace;
+  color: #f2b64c; backdrop-filter: blur(4px);
+}
+.mission-panel h3 { font-size: 15px; letter-spacing: 3px; margin-bottom: 16px; }
+.mission-stats { display: flex; justify-content: space-between; margin-bottom: 16px; text-align: center; }
+.mission-stats .ms { font-size: 19px; font-weight: 700; }
+.mission-stats .ms small { display: block; font-size: 8px; letter-spacing: 1px; color: #8a7346; margin-top: 4px; }
+.mission-mods { list-style: none; margin-bottom: 16px; }
+.mission-mods li { font-size: 10px; letter-spacing: 1px; padding: 4px 0; color: #d8b676; }
+.mission-mods li::before { content: '◉ '; color: #f2994a; }
+.mission-launch {
+  display: block; width: 100%; background: #f2b64c; border: none; color: #241a05;
+  font-family: inherit; font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  padding: 11px; cursor: pointer; border-radius: 3px;
+}
+.mission-launch:hover { background: #ffca66; }
+.mascot { position: absolute; left: 30px; bottom: 24px; display: flex; gap: 14px; align-items: flex-end; z-index: 6; }
+.mascot-sprite {
+  width: 86px; height: 86px; border-radius: 50%; font-size: 46px;
+  background: radial-gradient(circle at 35% 30%, #ff9d5c, #d64550);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 34px rgba(255,140,80,0.55);
+}
+.mascot-say {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #c9b28a;
+  line-height: 1.7; letter-spacing: 0.5px; max-width: 260px; padding-bottom: 6px;
+}
+.mascot-say b { color: #f2994a; }
+
+/* linkedin sim modal */
+.modal-back {
+  position: fixed; inset: 0; background: rgba(4,5,15,0.72); z-index: 90;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.li-card {
+  background: #f4f2ee; color: #1a1f36; width: 620px; max-width: 100%; border-radius: 12px;
+  overflow: hidden; box-shadow: 0 24px 70px rgba(0,0,0,0.6);
+}
+.li-chrome { background: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #e0ddd7; }
+.li-logo { background: #0a66c2; color: #fff; font-weight: 800; width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.li-body { padding: 20px 24px; max-height: 68vh; overflow-y: auto; }
+.li-banner { height: 64px; border-radius: 8px 8px 0 0; background: linear-gradient(120deg, #90b8d8, #37699b); }
+.li-profile { background: #fff; border-radius: 0 0 8px 8px; padding: 0 18px 16px; margin-bottom: 14px; }
+.li-avatar {
+  width: 74px; height: 74px; border-radius: 50%; border: 3px solid #fff; margin-top: -37px;
+  background: linear-gradient(135deg, #c9a9a1, #8a6f6a); display: flex; align-items: center;
+  justify-content: center; color: #fff; font-size: 24px; font-weight: 700;
+}
+.li-profile h3 { margin-top: 8px; font-size: 17px; }
+.li-role { font-size: 12.5px; color: #4b4f56; margin: 3px 0; }
+.li-loc { font-size: 11.5px; color: #8a8d92; margin-bottom: 10px; }
+.li-stats { display: flex; gap: 20px; font-size: 11.5px; color: #4b4f56; border-top: 1px solid #eee; padding-top: 10px; }
+.li-stats b { display: block; font-size: 14px; color: #1a1f36; }
+.li-section { background: #fff; border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; }
+.li-section h4 { font-size: 13px; margin-bottom: 8px; }
+.li-section p, .li-section li { font-size: 12px; color: #4b4f56; line-height: 1.55; }
+.li-exp { display: flex; gap: 10px; margin-bottom: 10px; }
+.li-exp-logo { width: 34px; height: 34px; border-radius: 5px; background: #e8e6e1; flex-shrink: 0; }
+.li-exp b { font-size: 12.5px; display: block; }
+.li-exp span { font-size: 11px; color: #8a8d92; }
+.li-actions { display: flex; gap: 9px; padding: 14px 24px 20px; background: #f4f2ee; }
+.li-btn { flex: 1; font: inherit; font-size: 12px; font-weight: 700; padding: 10px; border-radius: 20px; cursor: pointer; }
+.li-btn.primary { background: #0a66c2; color: #fff; border: none; }
+.li-btn.ghost { background: none; border: 1px solid #8a8d92; color: #4b4f56; }
+.li-btn.report { background: none; border: 1px solid #d64550; color: #d64550; }
+.li-feedback { margin: 0 24px 20px; border-radius: 9px; padding: 13px 15px; font-size: 12.5px; line-height: 1.55; }
+.li-feedback.good { background: #e2f6ee; border: 1px solid #b5e5d2; color: #0d5c40; }
+.li-feedback.bad { background: #fdeaec; border: 1px solid #f3c2c7; color: #8c2730; }
+
+/* misc */
+.footer-note { text-align: center; font-size: 11px; color: var(--ink-soft); padding: 18px; }
+.app-dark .footer-note { color: var(--dark-muted); }
+
+</style>
+</head>
+<body>
+<div id="root"><div style="font-family:sans-serif;padding:40px;color:#555">Loading demo… (needs internet on first open)</div></div>
+<script type="text/babel" data-presets="react">
+const Landing = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+function Landing({ onNavigate }) {
+  return (
+    <div className="landing">
+      <h1>Amplify</h1>
+      <div className="landing-kicker">PLATFORM ARCHITECTURE</div>
+
+      <div className="signal-row">
+        {['Microsoft Copilot', 'Claude Enterprise', 'Gemini', 'Workday'].map((s) => (
+          <div className="signal-pill" key={s}>{s}</div>
+        ))}
+      </div>
+
+      <div className="landing-hint" style={{ marginTop: -30, marginBottom: 44 }}>
+        connected signal sources — usage telemetry feeds the AI Pulse below
+      </div>
+
+      <div className="layer-row">
+        <div className="layer-card pulse-card" onClick={() => onNavigate('amplifyverse')}>
+          <div className="layer-icon">🖥️</div>
+          <h3>Frontend</h3>
+          <div className="layer-tag">LMS INTERFACE</div>
+          <p>The interface employees interact with for learning and experiences — the Amplifyverse, delivered through Microsoft Teams and the web.</p>
+        </div>
+        <div className="layer-card" onClick={() => onNavigate('orchestrator')}>
+          <div className="layer-icon">⚙️</div>
+          <h3>Backend</h3>
+          <div className="layer-tag">BUSINESS LOGIC</div>
+          <p>Handles business logic, data, and orchestrates all platform services — the Scenario Orchestrator and Command Centre run here.</p>
+        </div>
+        <div className="layer-card" onClick={() => onNavigate('cipher')}>
+          <div className="layer-icon">🧠</div>
+          <h3>AI Layer</h3>
+          <div className="layer-tag">CONTENT GENERATION</div>
+          <p>Embedded within the backend; responsible for generating learning content, scenarios, and dynamic material served to learners.</p>
+        </div>
+      </div>
+
+      <div className="arch-flow">
+        <span className="arch-node">Backend</span>
+        <span className="arch-arrow">→</span>
+        <span className="arch-node arch-node-accent">LiteLLM<small>unified API gateway</small></span>
+        <span className="arch-arrow">→</span>
+        <span className="arch-node">Claude Sonnet<small>content generation</small></span>
+      </div>
+      <div className="landing-hint" style={{ marginTop: 10 }}>
+        model-agnostic by design — the model can be swapped or extended without touching backend logic
+      </div>
+
+      <div className="landing-hint" style={{ marginTop: 30 }}>Click a layer to explore · All data shown is synthetic demo data</div>
+    </div>
+  )
+}
+
+return Landing;
+})();
+
+const SecurityPulse = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+const CONTEXTS = [
+  { icon: '📈', title: 'Overall Proficiency', desc: 'Aggregated usage telemetry across all skill vectors.' },
+  { icon: '✍️', title: 'Prompt Engineering', desc: 'Structured prompting, context setting, iteration habits.' },
+  { icon: '🤖', title: 'Agentic Workflows', desc: 'Delegating multi-step tasks to agents with review loops.' },
+  { icon: '🗂️', title: 'Data Judgment', desc: 'Knowing which data can go into which tool; approved workspaces.' },
+  { icon: '⚡', title: 'Shadow AI', desc: 'Unsanctioned tool usage — an enablement opportunity, not just a risk.' },
+]
+
+const QUADRANTS = [
+  { dot: '#17a673', name: 'Champions (High Mot, High Skill)', desc: 'AI power users. Give them frontier tools and let them evangelize.' },
+  { dot: '#d99a06', name: 'Rising (High Mot, Low Skill)', desc: 'Eager and motivated — just need the right templates and hands-on support to convert fast.' },
+  { dot: '#e2762d', name: 'Untapped (Low Mot, High Skill)', desc: 'Already capable. A peer win or a clear ROI story usually flips this group quickly.' },
+  { dot: '#4d7ee0', name: 'Getting Started (Low Mot, Low Skill)', desc: 'Earliest in the journey. Small wins and guided first steps close this gap fast.' },
+]
+
+// scatter points: [skill, motivation, quadrant color, team]
+const POINTS = [
+  [78, 88, '#17a673', 'Engineering'], [84, 81, '#17a673', 'TDI'], [68, 74, '#17a673', 'Marketing'],
+  [30, 79, '#d99a06', 'Finance'], [24, 68, '#d99a06', 'HR'], [38, 84, '#d99a06', 'Sales'],
+  [76, 30, '#e2762d', 'Security'], [82, 22, '#e2762d', 'Legal'],
+  [26, 24, '#4d7ee0', 'Field Ops'], [34, 18, '#4d7ee0', 'Contractors'],
+]
+
+const VECTORS = ['Prompting', 'Agent Use', 'Data Judgment', 'Automation']
+
+const MATRIX = {
+  Team: [
+    ['Engineering', 78, [82, 74, 79, 76]],
+    ['TDI', 74, [79, 71, 75, 72]],
+    ['Marketing', 66, [74, 58, 62, 68]],
+    ['Finance', 48, [55, 38, 61, 39]],
+    ['Sales', 44, [52, 33, 48, 41]],
+    ['HR', 42, [49, 31, 56, 33]],
+    ['Legal', 35, [41, 22, 58, 20]],
+  ],
+  Location: [
+    ['US', 61, [67, 54, 63, 58]],
+    ['India', 63, [68, 58, 62, 63]],
+    ['Canada', 58, [64, 51, 61, 55]],
+    ['Australia', 56, [62, 49, 59, 53]],
+    ['Romania', 59, [64, 53, 60, 58]],
+    ['UK', 60, [66, 52, 63, 57]],
+    ['Ireland', 57, [63, 50, 60, 54]],
+    ['Philippines', 55, [61, 48, 58, 52]],
+    ['Spain', 54, [60, 46, 58, 51]],
+    ['Japan', 49, [56, 40, 55, 44]],
+  ],
+  Seniority: [
+    ['Executive', 44, [52, 33, 56, 34]],
+    ['Director', 52, [59, 44, 58, 46]],
+    ['Manager', 57, [63, 50, 60, 54]],
+    ['IC — Senior', 66, [71, 61, 65, 66]],
+    ['IC — Junior', 71, [77, 66, 63, 74]],
+    ['Contractor', 41, [48, 31, 49, 35]],
+  ],
+}
+
+// proficiency: higher is better
+function heatColor(v) {
+  if (v >= 75) return { background: '#dff3e9', color: '#0d5c40' }
+  if (v >= 60) return { background: '#e9f2d4', color: '#4a5c0d' }
+  if (v >= 45) return { background: '#fbe9c2', color: '#7a5205' }
+  if (v >= 30) return { background: '#f9d7c0', color: '#7d3a10' }
+  return { background: '#f6c3c8', color: '#7c1e26' }
+}
+
+function Scatter() {
+  const W = 520, H = 360, PAD = 44
+  const x = (v) => PAD + (v / 100) * (W - PAD - 16)
+  const y = (v) => H - PAD - (v / 100) * (H - PAD - 16)
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%' }}>
+      {/* quadrant tints */}
+      <rect x={x(0)} y={y(100)} width={(x(50) - x(0))} height={y(50) - y(100)} fill="#d99a06" opacity="0.07" />
+      <rect x={x(50)} y={y(100)} width={(x(100) - x(50))} height={y(50) - y(100)} fill="#17a673" opacity="0.07" />
+      <rect x={x(0)} y={y(50)} width={(x(50) - x(0))} height={y(0) - y(50)} fill="#4d7ee0" opacity="0.07" />
+      <rect x={x(50)} y={y(50)} width={(x(100) - x(50))} height={y(0) - y(50)} fill="#e2762d" opacity="0.07" />
+      <text x={x(25)} y={y(76)} textAnchor="middle" fontSize="15" fontWeight="800" fill="#d99a06" opacity="0.4">RISING</text>
+      <text x={x(75)} y={y(76)} textAnchor="middle" fontSize="15" fontWeight="800" fill="#17a673" opacity="0.4">CHAMPIONS</text>
+      <text x={x(25)} y={y(24)} textAnchor="middle" fontSize="14" fontWeight="800" fill="#4d7ee0" opacity="0.45">GETTING STARTED</text>
+      <text x={x(75)} y={y(24)} textAnchor="middle" fontSize="15" fontWeight="800" fill="#e2762d" opacity="0.4">UNTAPPED</text>
+      {/* axes */}
+      <line x1={x(0)} y1={y(0)} x2={x(100)} y2={y(0)} stroke="#c8cde0" />
+      <line x1={x(0)} y1={y(0)} x2={x(0)} y2={y(100)} stroke="#c8cde0" />
+      {[0, 25, 50, 75, 100].map((t) => (
+        <g key={t}>
+          <text x={x(t)} y={H - PAD + 16} textAnchor="middle" fontSize="9" fill="#5a6178">{t}</text>
+          <text x={PAD - 8} y={y(t) + 3} textAnchor="end" fontSize="9" fill="#5a6178">{t}</text>
+        </g>
+      ))}
+      {/* diagonal frontier */}
+      <line x1={x(2)} y1={y(98)} x2={x(98)} y2={y(2)} stroke="#5a6178" strokeDasharray="5 4" opacity="0.5" />
+      {/* points */}
+      {POINTS.map(([a, m, c, team], i) => (
+        <g key={i}>
+          <circle cx={x(a)} cy={y(m)} r="6" fill={c} opacity="0.9">
+            <title>{team} — skill {a}, motivation {m}</title>
+          </circle>
+        </g>
+      ))}
+      <text x={W / 2} y={H - 8} textAnchor="middle" fontSize="10" fill="#5a6178">Skill (Tools, Training, Fluency) →</text>
+      <text x={13} y={H / 2} textAnchor="middle" fontSize="10" fill="#5a6178" transform={`rotate(-90 13 ${H / 2})`}>Motivation (Curiosity, Buy-in) →</text>
+    </svg>
+  )
+}
+
+function SecurityPulse() {
+  const [context, setContext] = useState(0)
+  const [tab, setTab] = useState('map')
+  const [axis, setAxis] = useState('Team')
+  const [popTab, setPopTab] = useState('Team')
+
+  return (
+    <div className="light-shell">
+      <aside className="sidebar">
+        <div className="sidebar-title">
+          <div className="sidebar-logo">AP</div>
+          <h2>AI Pulse</h2>
+        </div>
+        <div className="sidebar-sub">AI Proficiency Dashboard</div>
+        <div className="sidebar-section">VIEWS</div>
+        <button className={`sidebar-item ${tab === 'map' ? 'active' : ''}`} onClick={() => setTab('map')}>Adoption Mapping</button>
+        <button className={`sidebar-item ${tab === 'matrix' ? 'active' : ''}`} onClick={() => setTab('matrix')}>Proficiency Matrix</button>
+        <div className="sidebar-footer">
+          <div className="sidebar-section">PLATFORMS</div>
+          <a>› Amplifyverse</a>
+          <a>› Scenario Orchestrator</a>
+          <a>› Amplify</a>
+        </div>
+      </aside>
+
+      <div className="content">
+        <div className="sidebar-section" style={{ marginTop: 0 }}>▼ DASHBOARD SKILL CONTEXT</div>
+        <div className="context-row">
+          {CONTEXTS.map((c, i) => (
+            <button key={c.title} className={`context-card ${context === i ? 'selected' : ''}`} onClick={() => setContext(i)}>
+              <span className="cc-icon">{c.icon}</span>
+              <h4>{c.title}</h4>
+              <p>{c.desc}</p>
+            </button>
+          ))}
+        </div>
+
+        <div className="tab-row">
+          <button className={tab === 'map' ? 'active' : ''} onClick={() => setTab('map')}>Adoption Mapping</button>
+          <button className={tab === 'matrix' ? 'active' : ''} onClick={() => setTab('matrix')}>Proficiency Matrix</button>
+        </div>
+
+        {tab === 'map' && (
+          <div className="pulse-grid">
+            <div className="card">
+              <div className="scatter-head">
+                <h3>📊 Adoption Drivers Assessment</h3>
+                <div className="seg">
+                  {['Team', 'Location', 'Seniority'].map((t) => (
+                    <button key={t} className={popTab === t ? 'active' : ''} onClick={() => setPopTab(t)}>{t}</button>
+                  ))}
+                </div>
+              </div>
+              <div className="scatter-sub">Mapping populations to understand why AI adoption stalls — or takes off.</div>
+              <Scatter />
+            </div>
+            <div>
+              <div className="card">
+                <h3 style={{ fontSize: 13, marginBottom: 14 }}>Adoption Quadrants</h3>
+                <div className="quad-legend">
+                  {QUADRANTS.map((q) => (
+                    <div className="quad-item" key={q.name}>
+                      <span className="quad-dot" style={{ background: q.dot }} />
+                      <span><b>{q.name}</b><br />{q.desc}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="analyst-note">
+                  <h5>⚡ ANALYST INTERPRETATION ({popTab.toUpperCase()})</h5>
+                  Analyzing adoption by {popTab} highlights structural enablement gaps. A cluster in the
+                  'Rising' quadrant usually means a team is motivated but lacks workflow-specific templates and
+                  training — not a motivation problem, a support problem.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab === 'matrix' && (
+          <div className="card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <h3 style={{ fontSize: 14.5 }}>📍 Dynamic Proficiency Matrix</h3>
+                <div className="scatter-sub">Cross-reference AI proficiency scores (0–100, higher is better) across dimensions.</div>
+              </div>
+              <div className="matrix-controls">
+                <label>Y-AXIS</label>
+                <select value={axis} onChange={(e) => setAxis(e.target.value)}>
+                  {Object.keys(MATRIX).map((k) => <option key={k}>{k}</option>)}
+                </select>
+                <label>X-AXIS</label>
+                <select defaultValue="Skill Vector"><option>Skill Vector</option></select>
+              </div>
+            </div>
+            <table className="matrix">
+              <thead>
+                <tr>
+                  <th className="rowhead">{axis} vs Skill Vector</th>
+                  {VECTORS.map((v) => <th key={v}>{v}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {MATRIX[axis].map(([name, avg, vals]) => (
+                  <tr key={name}>
+                    <td className="rowlabel">{name}<span>Avg {avg}</span></td>
+                    {vals.map((v, i) => (
+                      <td key={i}><span className="heat" style={heatColor(v)}>{v}</span></td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+return SecurityPulse;
+})();
+
+const AdminCatalog = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+const MODULES = [
+  { title: 'Tap Card Learning', slug: 'tap-card', status: 'Draft', kind: 'lesson', coll: 'Other', updated: 'Jun 22, 2026', desc: 'AI-generated awareness cards on a new capability. Tap through a stacked deck to reveal key facts.' },
+  { title: 'Prompt Lab — Live Simulation', slug: 'prompt-lab-dynamic', status: 'Draft', kind: 'tool', coll: 'Prompt Lab', updated: 'Jun 22, 2026', desc: 'AI-generated workflow simulation. Each scenario targets a specific leverage moment.' },
+  { title: 'Automate Your Monday', slug: 'automate-monday', status: 'Published', kind: 'lesson', coll: 'Other', updated: 'Jun 22, 2026', desc: 'Hand your recurring Monday chores to an agent — inbox triage, status drafts, meeting prep.' },
+  { title: 'Prompt Patterns 101', slug: 'prompt-patterns', status: 'Published', kind: 'lesson', coll: 'Other', updated: 'Jun 17, 2026', desc: 'Role, context, format, examples: the four patterns behind reliable outputs.' },
+  { title: 'Meeting Notes in Minutes', slug: 'meeting-notes', status: 'Published', kind: 'lesson', coll: 'Other', updated: 'Jun 15, 2026', desc: 'From raw transcript to decisions-and-actions summary — with a reusable template.' },
+  { title: 'Shadow AI: The Incident', slug: 'shadow-ai-incident', status: 'Published', kind: 'lesson', coll: 'Other', updated: 'Jun 14, 2026', desc: 'Interactive story following a well-meaning employee who pastes source code into a public chatbot.' },
+  { title: 'Prompt Lab', slug: 'prompt-lab', status: 'Published', kind: 'tool', coll: 'Simulations', updated: 'Jun 22, 2026', desc: 'Inbox simulator — spot AI leverage moments across email, Teams, and docs.' },
+  { title: 'Agent Harbor', slug: 'agent-harbor', status: 'Published', kind: 'simulation', coll: 'Simulations', updated: 'Jun 11, 2026', desc: 'Agent-delegation tabletop simulation. Open this module to begin.' },
+]
+
+const COLLECTIONS = [
+  { order: 1, name: 'Prompt Lab', slug: 'prompt-lab', modules: 1 },
+  { order: 3, name: 'Agent Harbor', slug: 'agent-harbor', modules: 1 },
+  { order: 5, name: 'Simulations', slug: 'simulations', modules: 2 },
+  { order: 6, name: 'Other', slug: 'other', modules: 5 },
+]
+
+function AdminCatalog({ onNavigate }) {
+  const [view, setView] = useState('modules')
+  const [statusFilter, setStatusFilter] = useState('All')
+  const [collFilter, setCollFilter] = useState('All collections')
+
+  const shown = MODULES.filter(
+    (m) =>
+      (statusFilter === 'All' || m.status === statusFilter) &&
+      (collFilter === 'All collections' || m.coll === collFilter),
+  )
+
+  return (
+    <div className="light-shell">
+      <aside className="sidebar">
+        <div className="sidebar-title">
+          <div className="sidebar-logo">AM</div>
+          <h2>Amplify</h2>
+        </div>
+        <div className="sidebar-sub">Platform · Admin</div>
+        <div className="sidebar-section">CONTENT</div>
+        <button className={`sidebar-item ${view === 'modules' ? 'active' : ''}`} onClick={() => setView('modules')}>▦ Modules</button>
+        <button className={`sidebar-item ${view === 'collections' ? 'active' : ''}`} onClick={() => setView('collections')}>🗂 Collections</button>
+        <button className="sidebar-item">＋ Create / Import</button>
+        <div className="sidebar-section">PEOPLE</div>
+        <button className="sidebar-item">👥 Users</button>
+        <div className="sidebar-section">SYSTEM</div>
+        <button className="sidebar-item">⚙ Settings</button>
+        <button className="sidebar-item">ⓘ About</button>
+        <div className="sidebar-footer"><a onClick={() => onNavigate('amplifyverse')}>👁 View catalog</a></div>
+      </aside>
+
+      <div className="content">
+        {view === 'modules' && (
+          <>
+            <div className="catalog-head">
+              <h1>Modules <span style={{ fontSize: 13, color: 'var(--ink-soft)', fontWeight: 400 }}>({shown.length} shown)</span></h1>
+              <button className="btn btn-primary">＋ Create or import</button>
+            </div>
+            <div className="filter-row">
+              {['All', 'Published', 'Unlisted', 'Draft'].map((f) => (
+                <button key={f} className={`filter-pill ${statusFilter === f ? 'active' : ''}`} onClick={() => setStatusFilter(f)}>{f}</button>
+              ))}
+              <span className="filter-gap" />
+              {['All collections', 'Prompt Lab', 'Agent Harbor', 'Simulations', 'Other'].map((f) => (
+                <button key={f} className={`filter-pill ${collFilter === f ? 'active' : ''}`} onClick={() => setCollFilter(f)}>{f}</button>
+              ))}
+            </div>
+            {shown.map((m) => (
+              <div className="module-row" key={m.slug}>
+                <div className="module-info">
+                  <h4>
+                    {m.title}
+                    <span className={`chip ${m.status === 'Published' ? 'chip-green' : m.status === 'Draft' ? 'chip-amber' : 'chip-grey'}`}>{m.status}</span>
+                    <span className="chip chip-grey">{m.kind}</span>
+                  </h4>
+                  <div className="module-meta"><code>{m.slug}</code> {m.coll} · Updated {m.updated}</div>
+                  <div className="module-desc">{m.desc}</div>
+                </div>
+                <div className="module-actions">
+                  <button className="btn btn-sm btn-danger-ghost">Delete</button>
+                  <button className="btn btn-sm">Edit</button>
+                  <button className="btn btn-sm">Results</button>
+                  <button className="btn btn-sm btn-primary" onClick={() => m.slug.startsWith('prompt-lab') ? onNavigate('cipher') : onNavigate('amplifyverse')}>Launch →</button>
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+        {view === 'collections' && (
+          <>
+            <h1>Collections</h1>
+            <p className="content-sub">
+              Collections group modules together and appear as filters on the home page. They are shown in
+              order_index order — the first one is selected by default.
+            </p>
+            <div className="card" style={{ marginBottom: 16, display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 6 }}>New collection name</label>
+                <input type="text" placeholder="e.g. Simulations" style={{ width: '100%', font: 'inherit', fontSize: 13, padding: '9px 12px', borderRadius: 8, border: '1px solid var(--line)' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 6 }}>Order</label>
+                <input type="text" defaultValue="4" style={{ width: 70, font: 'inherit', fontSize: 13, padding: '9px 12px', borderRadius: 8, border: '1px solid var(--line)' }} />
+              </div>
+              <button className="btn btn-primary">＋ Add</button>
+            </div>
+            <div className="card" style={{ padding: 0 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                  <tr style={{ textAlign: 'left', color: 'var(--ink-soft)', fontSize: 10.5, letterSpacing: 1 }}>
+                    {['ORDER', 'NAME', 'SLUG', 'MODULES', 'ACTIONS'].map((col) => (
+                      <th key={col} style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)' }}>{col}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {COLLECTIONS.map((c) => (
+                    <tr key={c.slug}>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)' }}>{c.order} <button className="btn btn-sm" style={{ marginLeft: 8 }}>Set</button></td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)', fontWeight: 600 }}>{c.name}</td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)' }}><code style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, background: '#eef0f6', padding: '2px 7px', borderRadius: 5 }}>{c.slug}</code></td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)' }}>{c.modules}</td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)' }}><button className="btn btn-sm btn-danger-ghost">Delete</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+return AdminCatalog;
+})();
+
+const Orchestrator = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+const SKILL_TYPES = ['All', 'Prompting', 'Agents', 'Data', 'Automation']
+const POP_MODES = ['✦ AI Selected', '👥 By Persona', '🏢 By Group', '✕ Intersections']
+
+function Orchestrator({ onNavigate, campaign, setCampaign }) {
+  const [brief, setBrief] = useState('https://ai-blog.example.com/announcements/introducing-computer-use-agents-for-the-enterprise/')
+  const [skillType, setSkillType] = useState('All')
+  const [popMode, setPopMode] = useState('✦ AI Selected')
+  const [formats, setFormats] = useState({ sim: true, teams: true })
+  const [generating, setGenerating] = useState(false)
+  const [resultTab, setResultTab] = useState('Results')
+
+  const generate = () => {
+    setGenerating(true)
+    setTimeout(() => {
+      setCampaign({
+        title: 'Agentic Workflow Fundamentals',
+        source: brief,
+        emailPreview:
+          'Your quarterly board summary is due at 5pm. The source doc is 40 pages and marked Internal-Confidential. How do you get it done…',
+        simUrl: 'https://enablement-platform.example.com/modules/prompt-lab-dynamic?scenario_id=4d5a6be1-98a7-4a09-ad13-d6f1e5aeccf0',
+        teamsMessage:
+          '🚀 New AI skills scenario live: Agentic Workflows. Test your delegation skills at',
+        inferred: ['Inferred: Agents', 'Inferred: Data Judgment'],
+        recommended: ['⭐ Recommended', '🏆 Champions', '🔧 Frustrated', '🤨 Skeptical', '💤 Disengaged'],
+      })
+      setGenerating(false)
+    }, 1600)
+  }
+
+  return (
+    <div className="light-shell">
+      <aside className="sidebar">
+        <div className="sidebar-title">
+          <div className="sidebar-logo">⚡</div>
+          <h2>Orchestrator</h2>
+        </div>
+        <div className="sidebar-sub">AI Enablement</div>
+        <div className="sidebar-section">TOOLS</div>
+        <button className="sidebar-item active">✦ Generate Campaign</button>
+        <button className="sidebar-item">🕓 History</button>
+        <button className="sidebar-item">⚙ Settings</button>
+        <div className="sidebar-footer">
+          <div className="sidebar-section">PLATFORMS</div>
+          <a onClick={() => onNavigate('amplifyverse')}>› Amplifyverse</a>
+          <a onClick={() => onNavigate('pulse')}>› AI Pulse</a>
+          <a onClick={() => onNavigate('catalog')}>› Module Catalog</a>
+          <a onClick={() => onNavigate('command')}>› Amplify</a>
+        </div>
+      </aside>
+
+      <div className="content" style={{ maxWidth: 1250 }}>
+        <div className="orch-grid">
+          <div>
+            <h1>Generate Enablement Campaign</h1>
+            <p className="content-sub">Paste a capability brief. AI builds the training.</p>
+
+            <div className="card orch-step">
+              <h4>1 — CAPABILITY BRIEF</h4>
+              <textarea value={brief} onChange={(e) => setBrief(e.target.value)} />
+              <div style={{ marginTop: 12 }}>
+                <h4 style={{ marginBottom: 8 }}>SKILL FOCUS</h4>
+                <div className="pill-row">
+                  {SKILL_TYPES.map((r) => (
+                    <button key={r} className={`filter-pill small ${skillType === r ? 'active' : ''}`} onClick={() => setSkillType(r)}>{r}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="card orch-step">
+              <h4>2 — TARGET POPULATIONS</h4>
+              <div className="pill-row" style={{ marginBottom: 12 }}>
+                {POP_MODES.map((p) => (
+                  <button key={p} className={`filter-pill small ${popMode === p ? 'active' : ''}`} onClick={() => setPopMode(p)}>{p}</button>
+                ))}
+              </div>
+              {campaign ? (
+                <div className="inferred-tags">
+                  {campaign.inferred.map((t) => <span key={t} className="chip chip-purple">{t}</span>)}
+                  {campaign.recommended.map((t) => <span key={t} className="chip chip-grey">{t}</span>)}
+                </div>
+              ) : (
+                <p style={{ fontSize: 11.5, color: 'var(--ink-soft)' }}>
+                  Type a brief or select a skill focus above.<br />
+                  <em>No low-proficiency intersections found. Try a different skill focus or add a capability brief.</em>
+                </p>
+              )}
+              <button className="btn btn-sm" style={{ marginTop: 10 }} onClick={() => onNavigate('pulse')}>🔍 Explore in AI Pulse</button>
+            </div>
+
+            <div className="card orch-step">
+              <h4>3 — ENGAGEMENT FORMATS</h4>
+              <label className={`format-opt ${formats.sim ? 'checked' : ''}`}>
+                <input type="checkbox" checked={formats.sim} onChange={() => setFormats({ ...formats, sim: !formats.sim })} />
+                <div>
+                  <h5>🎯 Workflow Simulator</h5>
+                  <p>Realistic prompt-lab scenario. Recipients get a shareable link.</p>
+                </div>
+              </label>
+              <label className={`format-opt ${formats.teams ? 'checked' : ''}`}>
+                <input type="checkbox" checked={formats.teams} onChange={() => setFormats({ ...formats, teams: !formats.teams })} />
+                <div>
+                  <h5>💬 Amplify Teams Blast</h5>
+                  <p>Announcement message drafted for the Amplify Teams bot.</p>
+                </div>
+              </label>
+              <button className="btn btn-primary big-cta" onClick={generate} disabled={generating}>
+                {generating ? (<><span className="spin" />Synthesizing campaign…</>) : '✦ Generate'}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div className="tab-row">
+              {['Results', 'History', 'Settings'].map((t) => (
+                <button key={t} className={resultTab === t ? 'active' : ''} onClick={() => setResultTab(t)}>{t}</button>
+              ))}
+            </div>
+
+            {resultTab === 'Results' && !campaign && (
+              <div className="card">
+                <div className="empty-state">
+                  <div className="es-icon">📄</div>
+                  No campaign generated yet<br />
+                  <span style={{ fontSize: 11.5 }}>Fill in a capability brief and click Generate.</span>
+                </div>
+              </div>
+            )}
+
+            {resultTab === 'Results' && campaign && (
+              <>
+                <div className="card gen-result">
+                  <div className="gen-result-head">
+                    <h4><span className="status-dot" /> WORKFLOW SIMULATOR</h4>
+                    <span className="chip chip-grey">Email – Prompt Lab</span>
+                  </div>
+                  <b style={{ fontSize: 13.5 }}>{campaign.title}</b>
+                  <div className="gen-quote">{campaign.emailPreview}</div>
+                  <div className="gen-url">
+                    <code>{campaign.simUrl}</code>
+                    <button className="btn btn-sm">Copy</button>
+                  </div>
+                  <button className="btn btn-primary big-cta" onClick={() => onNavigate('cipher')}>Open Simulation</button>
+                </div>
+
+                <div className="card gen-result">
+                  <div className="gen-result-head">
+                    <h4><span className="status-dot" /> AMPLIFY TEAMS BLAST</h4>
+                    <span className="chip chip-grey">Teams Chat Campaign</span>
+                  </div>
+                  <div style={{ fontSize: 10.5, letterSpacing: 1, color: 'var(--ink-soft)', marginBottom: 8 }}>GENERATED MESSAGE</div>
+                  <div className="gen-quote" style={{ fontStyle: 'normal' }}>
+                    {campaign.teamsMessage} {campaign.simUrl}
+                  </div>
+                  <button className="btn btn-primary big-cta" onClick={() => onNavigate('command')}>Open in Amplify</button>
+                  <button className="btn big-cta">Copy Message</button>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <button className="btn btn-sm" onClick={() => setCampaign(null)}>Generate another scenario</button>
+                </div>
+              </>
+            )}
+
+            {resultTab !== 'Results' && (
+              <div className="card"><div className="empty-state">Nothing here yet in this demo.</div></div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+return Orchestrator;
+})();
+
+const CommandCentre = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+const STEPS = ['Details', 'Audience', 'Message', 'Review & Send']
+
+function CommandCentre({ onNavigate, campaign }) {
+  const [step, setStep] = useState(1)
+  const [sent, setSent] = useState(false)
+  const [audMode, setAudMode] = useState('Manual Entry')
+  const [email, setEmail] = useState('caroline.vonkonigsmark@example.com')
+
+  const title = campaign?.title || 'Agentic Workflow Fundamentals'
+
+  if (sent) {
+    return (
+      <div className="light-shell">
+        <Sidebar onNavigate={onNavigate} />
+        <div className="content">
+          <a style={{ fontSize: 12, color: 'var(--ink-soft)', cursor: 'pointer' }} onClick={() => setSent(false)}>← Back to Campaigns</a>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '10px 0 22px' }}>
+            <h1>Training: {title} <span className="chip chip-green" style={{ verticalAlign: 'middle', marginLeft: 8 }}>Completed</span></h1>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn btn-sm">Export CSV</button>
+              <button className="btn btn-sm">Export JSON</button>
+              <button className="btn btn-sm">⧉ Duplicate</button>
+            </div>
+          </div>
+
+          <div className="tab-row">
+            {['Overview', 'Audience', 'Message', 'Responses', 'Audit', 'Simulate'].map((t, i) => (
+              <button key={t} className={i === 0 ? 'active' : ''}>{t}</button>
+            ))}
+          </div>
+
+          <div className="stats-row">
+            <div className="stat-card"><div className="num">1</div><div className="lbl">AUDIENCE</div></div>
+            <div className="stat-card"><div className="num green">1</div><div className="lbl">DELIVERED</div></div>
+            <div className="stat-card"><div className="num">0</div><div className="lbl">RESPONSES</div></div>
+            <div className="stat-card"><div className="num">100%</div><div className="lbl">DELIVERY RATE</div></div>
+            <div className="stat-card"><div className="num">0%</div><div className="lbl">RESPONSE RATE</div></div>
+          </div>
+
+          <div className="card" style={{ marginBottom: 16 }}>
+            <h3 style={{ fontSize: 13.5, marginBottom: 14 }}>Delivery Status</h3>
+            <div className="donut-wrap">
+              <svg width="130" height="130" viewBox="0 0 130 130">
+                <circle cx="65" cy="65" r="52" fill="none" stroke="#eef0f6" strokeWidth="16" />
+                <circle cx="65" cy="65" r="52" fill="none" stroke="#17a673" strokeWidth="16"
+                  strokeDasharray="82 245" strokeLinecap="round" transform="rotate(-90 65 65)" />
+              </svg>
+              <div style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>
+                <span className="chip chip-green">● Delivered — 1</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
+            <h3 style={{ fontSize: 13.5, marginBottom: 14 }}>Campaign Info</h3>
+            <div className="campaign-info-grid">
+              <div>Created by: <b>caroline.vonkonigsmark@example.com</b></div>
+              <div>Created: <b>22/06/2026, 5:36:34 pm</b></div>
+              <div>Sent: <b>22/06/2026, 5:38:03 pm</b></div>
+              <div>Completed: <b>22/06/2026, 5:38:04 pm</b></div>
+              <div>Quiz: <b>No</b></div>
+              <div>Channel: <b>Teams Chat (Amplify bot)</b></div>
+            </div>
+          </div>
+          <div style={{ marginTop: 18 }}>
+            <button className="btn btn-primary" onClick={() => onNavigate('teams')}>View delivery in Teams →</button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="light-shell">
+      <Sidebar onNavigate={onNavigate} />
+      <div className="content" style={{ maxWidth: 860 }}>
+        <a style={{ fontSize: 12, color: 'var(--ink-soft)', cursor: 'pointer' }}>← Back to Campaigns</a>
+        <h1 style={{ margin: '10px 0 22px' }}>New Campaign</h1>
+
+        <div className="wizard-steps">
+          {STEPS.map((s, i) => (
+            <div key={s} className={`wstep ${i < step ? 'done' : i === step ? 'current' : ''}`}>
+              {i < step ? '✓ ' : ''}{s}
+            </div>
+          ))}
+        </div>
+
+        {step === 1 && (
+          <div className="card">
+            <h3 style={{ fontSize: 16, marginBottom: 18 }}>Select Audience</h3>
+            <div className="audience-tabs">
+              {['Manual Entry', 'CSV Upload', 'Teams Channel', 'OoO / Group'].map((m) => (
+                <button key={m} className={`btn btn-sm ${audMode === m ? 'btn-primary' : ''}`} onClick={() => setAudMode(m)}>{m}</button>
+              ))}
+            </div>
+            <div className="field">
+              <label>Email Addresses</label>
+              <div className="hint">Type or paste emails. Press Enter or comma to add.</div>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
+            <div className="wizard-nav">
+              <button className="btn" onClick={() => setStep(1)}>← Back</button>
+              <button className="btn btn-primary" onClick={() => setStep(2)}>Next →</button>
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="card">
+            <h3 style={{ fontSize: 16, marginBottom: 6 }}>Compose Message</h3>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 14 }}>
+              <span className="chip chip-grey">Quiz Mode ☐</span>
+              <span className="chip chip-purple">WYSIWYG</span>
+              <span className="chip chip-grey">Raw Markdown</span>
+              <span style={{ flex: 1 }} />
+              <button className="btn btn-sm">Preview</button>
+            </div>
+            <div className="compose-toolbar">
+              {['B', 'I', 'S', '</>', '🔗', '{ }', '•', '😀'].map((t) => <span key={t}>{t}</span>)}
+              <span style={{ flex: 1 }} />
+              <span style={{ color: 'var(--accent)' }}>✦ Refine</span>
+            </div>
+            <div className="compose-body">
+              🚀 <b>Think you could hand half your Monday to an AI agent?</b>
+              <p style={{ marginTop: 10 }}>
+                Agentic workflows let you delegate multi-step tasks — research, drafts, meeting prep — while
+                you stay in the review seat.
+              </p>
+              <p style={{ marginTop: 10 }}>Put your delegation skills to the test and find out what you'd hand off first. 👇</p>
+              <div className="compose-img">AGENTIC-WORKFLOWS — CAMPAIGN IMAGE</div>
+            </div>
+            <div style={{ display: 'flex', gap: 7, marginTop: 12 }}>
+              {['+ Text', '+ Buttons', '+ Image', '+ Divider'].map((b) => <button key={b} className="btn btn-sm">{b}</button>)}
+            </div>
+            <div className="field" style={{ marginTop: 20 }}>
+              <label>RESPONSE MESSAGES</label>
+              <div className="hint">Configure the messages users receive after interacting with the campaign.</div>
+              <input type="text" defaultValue="Thanks for your response!" />
+            </div>
+            <div className="wizard-nav">
+              <button className="btn" onClick={() => setStep(1)}>← Back</button>
+              <button className="btn btn-primary" onClick={() => setStep(3)}>Next →</button>
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="card">
+            <h3 style={{ fontSize: 16, marginBottom: 18 }}>Review &amp; Send</h3>
+            <div className="campaign-info-grid" style={{ marginBottom: 20 }}>
+              <div>Campaign: <b>{title}</b></div>
+              <div>Channel: <b>Teams Chat (Amplify bot)</b></div>
+              <div>Audience: <b>{email}</b></div>
+              <div>Quiz: <b>No</b></div>
+            </div>
+            <div className="wizard-nav">
+              <button className="btn" onClick={() => setStep(2)}>← Back</button>
+              <button className="btn btn-primary" onClick={() => setSent(true)}>🚀 Send Campaign</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function Sidebar({ onNavigate }) {
+  return (
+    <aside className="sidebar">
+      <div className="sidebar-title">
+        <div className="sidebar-logo" style={{ background: 'radial-gradient(circle at 35% 30%, #ff9d5c, #d64550)' }}>🤖</div>
+        <h2>Amplify</h2>
+      </div>
+      <div className="sidebar-sub">Command Centre</div>
+      <div className="sidebar-section">NAVIGATION</div>
+      <button className="sidebar-item active">📣 Campaigns</button>
+      <button className="sidebar-item">💬 Chatbot</button>
+      <button className="sidebar-item">⭐ Quiz &amp; Leaderboards</button>
+      <button className="sidebar-item">ⓘ About</button>
+      <button className="sidebar-item">‹/› Dev Guide</button>
+      <div className="sidebar-footer">
+        <div className="sidebar-section">PLATFORMS</div>
+        <a onClick={() => onNavigate('orchestrator')}>› Scenario Orchestrator</a>
+        <a onClick={() => onNavigate('teams')}>› Teams Delivery</a>
+      </div>
+    </aside>
+  )
+}
+
+return CommandCentre;
+})();
+
+const TeamsMock = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+const CHANNELS = [
+  'ai-exchange', 'ai-edge-weekly', 'amplify-testing', 'ai-champions',
+  'ai-enablement-priv…', 'ai-office-hours', 'ai-apj',
+  'agent-playbooks', 'ai-partners-lea…', 'ai-sessions-res…',
+]
+
+function TeamsMock({ onNavigate, campaign }) {
+  const msg = campaign?.teamsMessage ||
+    '🚀 New AI skills scenario live: Agentic Workflows. Test your delegation skills at'
+
+  return (
+    <div className="teams">
+      <div className="teams-rail">
+        <div className="rail-logo">◍</div>
+        <div className="rail-item"><span className="ri-icon">🔔</span>Activity</div>
+        <div className="rail-item active"><span className="ri-icon">💬</span>Chat</div>
+        <div className="rail-item"><span className="ri-icon">👥</span>Teams</div>
+        <div className="rail-item"><span className="ri-icon">📅</span>Calendar</div>
+        <div className="rail-item"><span className="ri-icon">📁</span>Files</div>
+        <div className="rail-item"><span className="ri-icon">⋯</span>More</div>
+      </div>
+
+      <div className="teams-sidebar">
+        <div className="teams-ws">Chat</div>
+        <div className="teams-section">▾ Pinned</div>
+        <div className="teams-chan active">🤖 Amplify</div>
+        <div className="teams-section">▾ Recent</div>
+        <div className="teams-chan">👤 Priya Ramaswami</div>
+        <div className="teams-chan">👤 Daniel Osei</div>
+        <div className="teams-chan">👤 Freya Lindqvist</div>
+        <div className="teams-section">▾ Teams</div>
+        {CHANNELS.map((c) => (
+          <div className="teams-chan" key={c}># {c}</div>
+        ))}
+      </div>
+
+      <div className="teams-main">
+        <div className="teams-header">
+          <span className="teams-avatar" style={{ width: 26, height: 26, fontSize: 15, borderRadius: '50%' }}>🤖</span>
+          Amplify <span className="teams-app-badge">APP</span>
+          <span style={{ fontWeight: 400, fontSize: 12.5, color: '#8a8886', marginLeft: 8 }}>Chat · Files · Organization</span>
+        </div>
+
+        <div className="teams-msgs">
+          <div className="teams-day"><span>Today</span></div>
+          <div className="teams-msg">
+            <div className="teams-avatar">🤖</div>
+            <div>
+              <div className="teams-msg-head">
+                <b>Amplify</b>
+                <span className="teams-app-badge">APP</span>
+                <span className="teams-time">5:38 PM</span>
+              </div>
+              <div className="teams-bubble">
+                🚀 <b>Think you could hand half your Monday to an AI agent?</b>
+                <br /><br />
+                Agentic workflows let you delegate multi-step tasks — research, drafts, meeting prep —
+                while you stay in the review seat.
+                <br /><br />
+                Put your delegation skills to the test and find out what you'd hand off first. 👇
+                <br /><br />
+                <a onClick={() => onNavigate('cipher')}>Take the simulation now</a>
+                <div style={{ fontSize: 11, color: '#8a8886', marginTop: 8 }}>(351 kB) ▾</div>
+                <div className="teams-img">AGENTIC-WORKFLOWS — CAMPAIGN IMAGE</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="teams-composer">Type a new message</div>
+      </div>
+    </div>
+  )
+}
+
+return TeamsMock;
+})();
+
+const CipherLetter = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+const CHOICES = [
+  { key: 'A', text: 'Paste the full document into your personal free chatbot account', good: false,
+    coach: "Fast, but the document is marked Internal-Confidential — personal free-tier tools may train on or retain your data. This is the moment Shadow AI happens. The approved enterprise workspace does the same job with the right data guarantees." },
+  { key: 'B', text: 'Use the approved enterprise AI workspace with a structured prompt', good: true,
+    coach: "Exactly right. Enterprise workspace + a structured prompt (role, audience, format, length) turns a 3-hour task into a 20-minute review. Bonus: save the prompt as a template so the whole team benefits next quarter." },
+  { key: 'C', text: 'Skip AI and do it manually to be safe', good: false,
+    coach: "Safe, but you just spent 3 hours on a task AI does in minutes — this is a leverage moment missed. 'Safe' and 'AI' aren't opposites: the approved workspace exists precisely so you don't have to choose." },
+]
+
+const FLAGS = [
+  'Tight deadline — a classic AI acceleration moment',
+  'Document is Internal-Confidential — approved tools only',
+  'Task is summarisation, a core LLM strength',
+  'A reusable prompt template exists for board summaries',
+]
+
+function CipherLetter({ onNavigate }) {
+  const [phase, setPhase] = useState('inbox') // inbox → reveal → persona
+  const [picked, setPicked] = useState(null)
+  const [investigated, setInvestigated] = useState(false)
+  const [ticked, setTicked] = useState([])
+
+  const toggleFlag = (f) =>
+    setTicked((t) => (t.includes(f) ? t.filter((x) => x !== f) : [...t, f]))
+
+  return (
+    <div className="sim-shell">
+      <div className="sim-topbar">
+        <h2>
+          <span className="chip chip-purple">✉ Prompt Lab</span>
+          Prompt Lab — Live Simulation
+          <span className="chip chip-amber">Draft preview</span>
+        </h2>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-sm" onClick={() => { setPhase('inbox'); setPicked(null); setTicked([]); setInvestigated(false) }}>Reset state</button>
+          <button className="btn btn-sm" onClick={() => onNavigate('catalog')}>← All modules</button>
+        </div>
+      </div>
+
+      {phase !== 'inbox' && (
+        <div className="attack-banner" style={{ background: 'var(--green)' }}>✨ This was an AI leverage moment</div>
+      )}
+
+      {phase === 'persona' ? (
+        <Persona onNavigate={onNavigate} />
+      ) : (
+        <>
+          {phase === 'inbox' && (
+            <div style={{ textAlign: 'center', fontSize: 11.5, color: 'var(--ink-soft)', marginBottom: 12 }}>
+              MESSAGE 1 OF 1
+            </div>
+          )}
+
+          <div style={phase === 'reveal' ? { display: 'grid', gridTemplateColumns: '1fr 320px', gap: 18, alignItems: 'start' } : {}}>
+            <div className="mail-window">
+              <div className="mail-chrome">
+                <span className="mail-logo">M ail</span>
+                <span className="mail-search">🔍 Search mail</span>
+                <span>⚙</span>
+              </div>
+              <div className="mail-body">
+                <div className="mail-nav">
+                  <div className="active"><span>📥 Inbox</span><span>1</span></div>
+                  <div><span>⭐ Starred</span></div>
+                  <div><span>🕓 Snoozed</span></div>
+                  <div><span>📤 Sent</span></div>
+                  <div><span>📝 Drafts</span></div>
+                </div>
+                <div className="mail-content">
+                  <h3>Board summary needed by 5pm today</h3>
+                  <div className="mail-from">
+                    <div className="mail-from-avatar" style={{ background: '#3d5af1' }}>PS</div>
+                    <div>
+                      <b>Priya Sharma — Chief of Staff</b>
+                      <span style={{ fontSize: 11, color: 'var(--ink-soft)' }}>To: me</span>
+                      <span className="mail-from-addr">priya.sharma@meridian.com</span>
+                    </div>
+                    <span className="mail-date">11:42 AM</span>
+                  </div>
+                  <p className="mail-text">
+                    Hi — the board meeting moved up to 5pm today. I need a one-page summary of the Q2 operations
+                    review (the 40-page deck, marked <code>Internal-Confidential</code>): key decisions, risks,
+                    and asks, in the usual board format. Sorry for the crunch — can you get this to me by 4:30?
+                  </p>
+
+                  {phase === 'inbox' &&
+                    CHOICES.map((c) => (
+                      <button
+                        key={c.key}
+                        className={`choice ${picked === c.key ? (c.good ? 'picked-good' : 'picked-bad') : ''}`}
+                        onClick={() => setPicked(c.key)}
+                      >
+                        <span className="key">{c.key}</span>
+                        {c.text}
+                      </button>
+                    ))}
+                </div>
+              </div>
+
+              {phase === 'inbox' && picked && (
+                <div className="coach-box">
+                  <h5>COACHING — OPTION {picked}</h5>
+                  <p>{CHOICES.find((c) => c.key === picked).coach}</p>
+                  <div className="coach-rate">
+                    <button className="btn btn-sm">Not very useful</button>
+                    <button className="btn btn-sm">Helpful</button>
+                  </div>
+                </div>
+              )}
+
+              {phase === 'inbox' && investigated && (
+                <div className="coach-box">
+                  <h5>CHECK THE DATA CLASSIFICATION</h5>
+                  <p>The deck is labelled Internal-Confidential. Policy allows it in the enterprise AI workspace (SSO, zero-retention) — but never in personal free-tier tools.</p>
+                </div>
+              )}
+
+              {phase === 'inbox' && (
+                <div className="sim-actions">
+                  <button className="btn" onClick={() => setInvestigated(true)}>
+                    🔍 Investigate <span className="chip chip-amber" style={{ marginLeft: 6 }}>{investigated ? '1 left' : '2 left'}</span>
+                  </button>
+                  <button className="btn btn-primary" onClick={() => setPhase('reveal')}>
+                    ✨ Submit my approach
+                  </button>
+                  <button className="btn">⏭ Skip</button>
+                </div>
+              )}
+            </div>
+
+            {phase === 'reveal' && (
+              <div className="card">
+                <h4 style={{ fontSize: 11, letterSpacing: 1.2, color: 'var(--green)', marginBottom: 12 }}>
+                  LEVERAGE SIGNALS — TICK THE ONES YOU NOTICED
+                </h4>
+                {FLAGS.map((f) => (
+                  <label key={f} className={`flag-item ${ticked.includes(f) ? 'ticked' : ''}`} style={ticked.includes(f) ? { borderColor: 'var(--green)', background: 'var(--green-soft)' } : {}}>
+                    <input type="checkbox" checked={ticked.includes(f)} onChange={() => toggleFlag(f)} />
+                    <span>✨ {f}</span>
+                  </label>
+                ))}
+                <button className="btn btn-primary big-cta" style={{ background: 'var(--purple)', borderColor: 'var(--purple)', marginTop: 10 }} onClick={() => setPhase('persona')}>
+                  View Report →
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+function Persona({ onNavigate }) {
+  return (
+    <div className="persona-quad">
+      <h2 style={{ fontSize: 18 }}>Where you sit</h2>
+      <p style={{ fontSize: 12.5, color: 'var(--ink-soft)', marginTop: 6 }}>
+        Based on your responses: speed of adoption vs. depth of judgment.
+      </p>
+      <div className="persona-grid">
+        <div className="pq-cell" style={{ background: '#e2f6ee', color: '#0d5c40' }}><span>🦅</span>Eagle</div>
+        <div className="pq-cell" style={{ background: '#fdf3d7', color: '#7a5205' }}><span>🐿️</span>Squirrel</div>
+        <div className="pq-cell" style={{ background: '#e7ebfd', color: '#2f3d8f' }}><span>🐢</span>Tortoise</div>
+        <div className="pq-cell" style={{ background: '#fdeaec', color: '#7c1e26' }}><span>🦁</span>Lion</div>
+        <div className="pq-you" style={{ top: '38%', right: '12%' }}>YOU</div>
+      </div>
+      <div className="pq-axis"><span>Cautious adoption</span><span>Bold adoption</span></div>
+
+      <div className="persona-result">
+        <b>⚡ The Quick Adopter (you)</b>
+        <p style={{ marginTop: 8, color: 'var(--ink-soft)' }}>
+          You reach for AI fast — great for leverage, risky without a data check. You picked the right tool
+          and spotted 3 of 4 leverage signals. Pair your speed with a two-second classification check and
+          you move into Strategic Operator territory.
+        </p>
+        <p style={{ marginTop: 8, fontSize: 11.5, color: 'var(--ink-soft)' }}>
+          Other personas: The Confident Builder · The Strategic Operator · The Steady Learner
+        </p>
+      </div>
+      <div style={{ marginTop: 18, display: 'flex', gap: 10, justifyContent: 'center' }}>
+        <button className="btn" onClick={() => onNavigate('amplifyverse')}>Back to the Amplifyverse</button>
+        <button className="btn btn-primary" onClick={() => onNavigate('pulse')}>See team impact in AI Pulse</button>
+      </div>
+    </div>
+  )
+}
+
+return CipherLetter;
+})();
+
+const Amplifyverse = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+const PLANETS = [
+  { id: 'cipher', name: 'PROMPT LAB', color: '#e2762d', x: 22, y: 38, size: 58, labelColor: '#e2762d',
+    stats: [0, 0, 0], mods: ['Prompt Lab — Live Simulation'] },
+  { id: 'harbor', name: 'AGENT HARBOR', color: '#8b3ff0', x: 45, y: 26, size: 66, labelColor: '#a678f5',
+    stats: [0, 0, 0], mods: ['Agent Harbor'] },
+  { id: 'sims', name: 'SIMULATIONS', color: '#e838a8', x: 18, y: 66, size: 50, labelColor: '#e838a8',
+    stats: [2, 2, 0], mods: ['Prompt Lab', 'Agent Harbor'] },
+  { id: 'other', name: 'OTHER', color: '#f2b64c', x: 38, y: 62, size: 54, labelColor: '#f2b64c',
+    stats: [6, 6, 0], mods: ['Automate Your Monday', 'Tap Card Learning', 'Prompt Patterns 101', 'Shadow AI: The Incident', 'Meeting Notes in Minutes', 'Test'] },
+]
+
+const MODULES = [
+  { coll: 'PROMPT LAB', tag: 'TOOL', title: 'Prompt Lab', desc: 'Inbox simulator — spot AI leverage moments across email, Teams, and docs. Your responses reveal your AI persona.', updated: 'Jun 19', target: 'cipher' },
+  { coll: 'AGENT HARBOR', tag: 'SIMULATION', title: 'Agent Harbor', desc: 'Agent-delegation tabletop. Open this module to begin.', updated: 'Jun 11', target: 'vendor' },
+  { coll: 'SIMULATIONS', tag: 'TOOL', title: 'Prompt Lab', desc: 'Inbox simulator — spot AI leverage moments across email, Teams, and docs.', updated: 'Jun 19', target: 'cipher' },
+  { coll: 'SIMULATIONS', tag: 'SIMULATION', title: 'Agent Harbor', desc: 'Open this module to begin.', updated: 'Jun 11', target: 'vendor' },
+  { coll: 'OTHER', tag: 'LESSON', title: 'Automate Your Monday', desc: 'Hand your recurring Monday chores to an agent — inbox triage, status drafts, meeting prep.', updated: 'Jun 22', target: 'vendor' },
+  { coll: 'OTHER', tag: 'LESSON', title: 'Shadow AI: The Incident', desc: 'Interactive story about a well-meaning employee and a public chatbot.', updated: 'Jun 14', target: 'cipher' },
+]
+
+function Stars() {
+  const stars = useMemo(
+    () =>
+      Array.from({ length: 130 }, (_, i) => ({
+        left: (i * 37.3) % 100,
+        top: (i * 61.7) % 100,
+        size: 1 + ((i * 13) % 3),
+        opacity: 0.25 + ((i * 7) % 60) / 100,
+      })),
+    [],
+  )
+  return (
+    <>
+      {stars.map((s, i) => (
+        <span key={i} className="star" style={{ left: `${s.left}%`, top: `${s.top}%`, width: s.size, height: s.size, opacity: s.opacity }} />
+      ))}
+    </>
+  )
+}
+
+function Amplifyverse({ onNavigate }) {
+  const [view, setView] = useState('home') // home | galaxy
+  const [collTab, setCollTab] = useState('SIMULATIONS')
+  const [selected, setSelected] = useState(null)
+  const [vendor, setVendor] = useState(false)
+  const [vendorOutcome, setVendorOutcome] = useState(null)
+
+  if (view === 'galaxy') {
+    const p = PLANETS.find((x) => x.id === selected)
+    return (
+      <div className="galaxy">
+        <Stars />
+        <div className="galaxy-hud">
+          <span className="hud-brand">⚡ AMPLIFYVERSE</span>
+          <span className="hud-tab on">🗺 GALAXY MAP</span>
+          <span className="hud-tab">MISSIONS</span>
+          <span className="hud-tab">ACHIEVEMENTS</span>
+          <span className="hud-tab">LEADERBOARD</span>
+          <span className="hud-xp">✦ 1,200 XP</span>
+          <span className="hud-tab" style={{ cursor: 'pointer' }} onClick={() => setView('home')}>CAROLINE VON KONIGSMARK ▾</span>
+        </div>
+
+        {PLANETS.map((pl) => (
+          <div key={pl.id} className="planet-wrap" style={{ left: `${pl.x}%`, top: `${pl.y}%` }} onClick={() => setSelected(pl.id)}>
+            <div className="planet" style={{
+              width: pl.size, height: pl.size,
+              background: `radial-gradient(circle at 32% 28%, ${pl.color}, #10091c 130%)`,
+              boxShadow: `0 0 26px ${pl.color}66`,
+            }}>
+              {selected === pl.id && <div className="planet-ring" />}
+            </div>
+            <div className="planet-label" style={{ color: pl.labelColor }}>{pl.name}</div>
+          </div>
+        ))}
+
+        {/* Earth easter egg */}
+        <div className="planet-wrap" style={{ right: '12%', top: '30%', cursor: 'default' }}>
+          <div className="planet" style={{
+            width: 120, height: 120,
+            background: 'radial-gradient(circle at 35% 30%, #7ec8ff, #1c56c9 60%, #0a1e52 110%)',
+            boxShadow: '0 0 44px rgba(80,150,255,0.5)',
+          }} />
+        </div>
+
+        {p && (
+          <div className="mission-panel">
+            <h3>{p.name}</h3>
+            <div className="mission-stats">
+              <div className="ms">{p.stats[0]}<small>MODULES</small></div>
+              <div className="ms">{p.stats[1]}<small>AVAILABLE</small></div>
+              <div className="ms">{p.stats[2]}<small>CLEARED</small></div>
+            </div>
+            <ul className="mission-mods">
+              {p.mods.map((m) => <li key={m}>{m}</li>)}
+            </ul>
+            <button className="mission-launch" onClick={() => (p.id === 'harbor' ? setVendor(true) : onNavigate('cipher'))}>
+              ⊕ LAUNCH MISSION ›
+            </button>
+          </div>
+        )}
+
+        <div className="mascot">
+          <div className="mascot-sprite">🤖</div>
+          <div className="mascot-say">
+            <b>» Amplify</b><br />
+            {selected
+              ? `${PLANETS.find((x) => x.id === selected).mods.length} modules detected in the ${PLANETS.find((x) => x.id === selected).name.toLowerCase()} sector. Clearance status: active.`
+              : 'Incoming signal from Agent Harbor. 2 missions queued for launch.'}
+          </div>
+        </div>
+
+        {vendor && (
+          <VendorSim
+            outcome={vendorOutcome}
+            setOutcome={setVendorOutcome}
+            close={() => { setVendor(false); setVendorOutcome(null) }}
+          />
+        )}
+      </div>
+    )
+  }
+
+  const shown = MODULES.filter((m) => m.coll === collTab)
+
+  return (
+    <div className="amplify-shell">
+      <aside className="amplify-side">
+        <div className="as-brand">✦ THE AMPLIFYVERSE</div>
+        <div className="sidebar-section">LEARNER</div>
+        <button className="amplify-item active">🏠 Home</button>
+        <button className="amplify-item">▦ Modules</button>
+        <div className="sidebar-section">QUICK LINKS</div>
+        <button className="amplify-item">💬 Ask Amplify</button>
+        <button className="amplify-item">🧰 Approved AI Tools</button>
+        <button className="amplify-item">🧱 Stacks 4 Hacks</button>
+        <div className="sidebar-section">ADMIN</div>
+        <button className="amplify-item" onClick={() => onNavigate('catalog')}>⚙ Admin</button>
+      </aside>
+
+      <div className="amplify-main">
+        <div className="galaxy-toggle">
+          <span style={{ fontSize: 11, color: 'var(--dark-muted)' }}>v2 classic</span>
+          <button className="btn btn-sm btn-primary" onClick={() => setView('galaxy')}>🪐 Switch to v3 Galaxy Map</button>
+        </div>
+
+        <div className="welcome-hero">
+          <h1>Welcome, Caroline von Konigsmark.</h1>
+          <p>Pick a module below to get started. Your progress is saved as you go, and your submissions stay private to you and your admins.</p>
+        </div>
+
+        <div className="avail-head">
+          <h4>AVAILABLE MODULES</h4>
+          <span>8 available</span>
+        </div>
+        <div className="collection-tabs">
+          {['PROMPT LAB', 'AGENT HARBOR', 'SIMULATIONS', 'OTHER'].map((c) => (
+            <button key={c} className={`ctab ${collTab === c ? 'active' : ''}`} onClick={() => setCollTab(c)}>{c}</button>
+          ))}
+        </div>
+        <div className="mod-cards">
+          {shown.map((m, i) => (
+            <div className="mod-card" key={i}>
+              <span className="tag">{m.tag}</span>
+              <h4>{m.title}</h4>
+              <p>{m.desc}</p>
+              <div className="mod-card-foot">
+                <span>Updated {m.updated}</span>
+                <button onClick={() => (m.target === 'cipher' ? onNavigate('cipher') : setVendor(true))}>Open →</button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {vendor && (
+          <VendorSim
+            outcome={vendorOutcome}
+            setOutcome={setVendorOutcome}
+            close={() => { setVendor(false); setVendorOutcome(null) }}
+          />
+        )}
+      </div>
+    </div>
+  )
+}
+
+function VendorSim({ outcome, setOutcome, close }) {
+  return (
+    <div className="modal-back" onClick={close}>
+      <div className="li-card" onClick={(e) => e.stopPropagation()}>
+        <div className="li-chrome">
+          <div className="li-logo">in</div>
+          <span style={{ fontSize: 12, color: '#8a8d92' }}>Search</span>
+          <span style={{ flex: 1 }} />
+          <span style={{ fontSize: 11.5, color: '#8a8d92' }}>Home · My Network · Messaging · Notifications</span>
+          <button onClick={close} style={{ border: 'none', background: '#0a66c2', color: '#fff', borderRadius: '50%', width: 22, height: 22, cursor: 'pointer' }}>✕</button>
+        </div>
+        <div className="li-body">
+          <div className="li-banner" />
+          <div className="li-profile">
+            <div className="li-avatar" style={{ background: 'linear-gradient(135deg, #7b5cf0, #3d5af1)' }}>NA</div>
+            <h3>NovaAI Tools</h3>
+            <div className="li-role">"SummarizeGPT — your meetings, summarized. 100% free forever."</div>
+            <div className="li-loc">Software company · 11–50 employees</div>
+            <div className="li-stats">
+              <span><b>2,4k</b> Followers</span>
+              <span><b>8</b> Posts</span>
+              <span><b>3 mo</b> Page age</span>
+            </div>
+          </div>
+          <div className="li-section">
+            <h4>Sponsored message</h4>
+            <p>
+              Hi Caroline! 👋 Loved your post about meeting overload. SummarizeGPT gives you instant AI
+              summaries of every meeting — completely free. Just connect your Google Drive and calendar and
+              we handle the rest. Setup takes 30 seconds — no IT approval needed!
+            </p>
+          </div>
+          <div className="li-section">
+            <h4>What to weigh</h4>
+            <ul style={{ paddingLeft: 18 }}>
+              <li>"Free forever" + full Drive access — what's the business model?</li>
+              <li>3-month-old company page, no security or privacy documentation</li>
+              <li>"No IT approval needed" is a pitch aimed at bypassing your tool-intake process</li>
+              <li>Your org already has an approved meeting-summary workflow</li>
+            </ul>
+          </div>
+        </div>
+        {outcome && (
+          <div className={`li-feedback ${outcome === 'report' ? 'good' : 'bad'}`}>
+            {outcome === 'report' ? (
+              <><b>✓ Best move.</b> Submitting the tool for vetting keeps the door open — if it's legit, IT can approve it for everyone; if not, you just prevented an org-wide Drive exposure. Enablement means more AI, through the right door.</>
+            ) : outcome === 'connect' ? (
+              <><b>✗ Risky.</b> Connecting Drive grants a 3-month-old unvetted vendor access to everything you can see. "Free forever" usually means your data is the product. Route it through tool intake instead — approval often takes days, not months.</>
+            ) : (
+              <><b>△ Understandable.</b> Ignoring it protects you, but colleagues got the same pitch. Submitting it for vetting (30 seconds) protects the whole org — and if the tool is good, everyone gets it properly.</>
+            )}
+          </div>
+        )}
+        <div className="li-actions">
+          <button className="li-btn primary" onClick={() => setOutcome('connect')}>Connect Google Drive</button>
+          <button className="li-btn ghost" onClick={() => setOutcome('ignore')}>Ignore</button>
+          <button className="li-btn report" onClick={() => setOutcome('report')}>Submit for Vetting</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+return Amplifyverse;
+})();
+
+const App = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+const PAGES = [
+  { id: 'landing', label: 'Overview' },
+  { id: 'pulse', label: 'AI Pulse' },
+  { id: 'catalog', label: 'Module Catalog' },
+  { id: 'orchestrator', label: 'Scenario Orchestrator' },
+  { id: 'command', label: 'Amplify Command Centre' },
+  { id: 'teams', label: 'Teams Delivery' },
+  { id: 'cipher', label: 'Prompt Lab' },
+  { id: 'amplifyverse', label: 'The Amplifyverse' },
+]
+
+function App() {
+  const [page, setPage] = useState('landing')
+  // shared state: campaign generated by the orchestrator flows into command centre + teams
+  const [campaign, setCampaign] = useState(null)
+
+  const darkPages = ['landing', 'amplifyverse']
+
+  return (
+    <div className={`app ${darkPages.includes(page) ? 'app-dark' : 'app-light'}`}>
+      <nav className="topnav">
+        <div className="topnav-brand" onClick={() => setPage('landing')}>
+          <span className="brand-mark">AMP</span>
+          <span className="brand-name">Amplify</span>
+        </div>
+        <div className="topnav-links">
+          {PAGES.map((p) => (
+            <button
+              key={p.id}
+              className={`topnav-link ${page === p.id ? 'active' : ''}`}
+              onClick={() => setPage(p.id)}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <div className="topnav-user">
+          <span className="user-avatar">C</span>
+          <span className="user-name">Caroline von Konigsmark</span>
+          <span className="user-badge">ADMIN</span>
+        </div>
+      </nav>
+      <main className="page">
+        {page === 'landing' && <Landing onNavigate={setPage} />}
+        {page === 'pulse' && <SecurityPulse />}
+        {page === 'catalog' && <AdminCatalog onNavigate={setPage} />}
+        {page === 'orchestrator' && (
+          <Orchestrator onNavigate={setPage} campaign={campaign} setCampaign={setCampaign} />
+        )}
+        {page === 'command' && <CommandCentre onNavigate={setPage} campaign={campaign} />}
+        {page === 'teams' && <TeamsMock onNavigate={setPage} campaign={campaign} />}
+        {page === 'cipher' && <CipherLetter onNavigate={setPage} />}
+        {page === 'amplifyverse' && <Amplifyverse onNavigate={setPage} />}
+      </main>
+    </div>
+  )
+}
+
+return App;
+})();
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>
