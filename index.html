@@ -1,0 +1,3171 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Amplify — AI Enablement Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.26.4/babel.min.js"></script>
+<style>
+:root {
+  --ink: #1a1f36;
+  --ink-soft: #5a6178;
+  --line: #e4e7f0;
+  --paper: #f7f8fb;
+  --card: #ffffff;
+  --accent: #3d5af1;
+  --accent-soft: #eaeefe;
+  --green: #17a673;
+  --green-soft: #e2f6ee;
+  --amber: #d99a06;
+  --amber-soft: #fdf3d7;
+  --red: #d64550;
+  --red-soft: #fdeaec;
+  --purple: #7b5cf0;
+  --dark-bg: #0b0d1e;
+  --dark-card: #151833;
+  --dark-line: #2b2f55;
+  --dark-text: #e8eaf6;
+  --dark-muted: #8b90b5;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  color: var(--ink);
+  background: var(--paper);
+}
+
+.app { min-height: 100vh; display: flex; flex-direction: column; }
+.app-dark { background: var(--dark-bg); color: var(--dark-text); }
+.app-light { background: var(--paper); color: var(--ink); }
+
+/* ---------- Top nav ---------- */
+.topnav {
+  display: flex; align-items: center; gap: 20px;
+  padding: 10px 22px;
+  background: #0e1130;
+  color: #fff;
+  position: sticky; top: 0; z-index: 50;
+}
+.topnav-brand { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.brand-mark {
+  background: linear-gradient(135deg, #5b6cff, #a45bf0);
+  font-weight: 800; font-size: 12px; padding: 5px 8px; border-radius: 7px;
+  letter-spacing: 0.5px;
+}
+.brand-name { font-weight: 700; font-size: 14px; white-space: nowrap; }
+.topnav-links { display: flex; gap: 2px; flex: 1; overflow-x: auto; }
+.topnav-link {
+  background: none; border: none; color: #a3a9d6; font: inherit; font-size: 12.5px;
+  padding: 7px 11px; border-radius: 7px; cursor: pointer; white-space: nowrap;
+}
+.topnav-link:hover { color: #fff; background: rgba(255,255,255,0.08); }
+.topnav-link.active { color: #fff; background: rgba(91,108,255,0.35); font-weight: 600; }
+.topnav-user { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.user-avatar {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: linear-gradient(135deg, #35c3a9, #3d5af1);
+  display: flex; align-items: center; justify-content: center; font-weight: 700;
+}
+.user-name { color: #c9cdf0; white-space: nowrap; }
+.user-badge {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 1px;
+  background: #35c3a9; color: #06251d; padding: 3px 7px; border-radius: 20px;
+}
+
+.page { flex: 1; }
+
+/* ---------- Shared light-page chrome ---------- */
+.light-shell { display: flex; min-height: calc(100vh - 46px); }
+.sidebar {
+  width: 220px; flex-shrink: 0; border-right: 1px solid var(--line);
+  background: var(--card); padding: 20px 14px;
+}
+.sidebar-title { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
+.sidebar-logo {
+  width: 30px; height: 30px; border-radius: 8px; color: #fff; font-weight: 800; font-size: 12px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, #3d5af1, #7b5cf0);
+}
+.sidebar-title h2 { font-size: 13.5px; }
+.sidebar-sub { font-size: 10.5px; color: var(--ink-soft); margin: 2px 0 20px 39px; }
+.sidebar-section { font-size: 10px; font-weight: 700; letter-spacing: 1.2px; color: var(--ink-soft); margin: 18px 0 6px; }
+.sidebar-item {
+  display: block; width: 100%; text-align: left; background: none; border: none;
+  font: inherit; font-size: 13px; color: var(--ink); padding: 8px 10px;
+  border-radius: 8px; cursor: pointer;
+}
+.sidebar-item:hover { background: var(--paper); }
+.sidebar-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+.sidebar-footer { margin-top: 30px; font-size: 11.5px; color: var(--ink-soft); }
+.sidebar-footer a { display: block; color: var(--ink-soft); text-decoration: none; padding: 3px 0; cursor: pointer; }
+.sidebar-footer a:hover { color: var(--accent); }
+
+.content { flex: 1; padding: 26px 32px; max-width: 1200px; }
+.content h1 { font-size: 21px; margin-bottom: 4px; }
+.content-sub { color: var(--ink-soft); font-size: 13px; margin-bottom: 22px; }
+
+/* ---------- Cards, chips, buttons ---------- */
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; }
+.btn {
+  border: 1px solid var(--line); background: var(--card); color: var(--ink);
+  font: inherit; font-size: 12.5px; font-weight: 600; padding: 8px 14px;
+  border-radius: 8px; cursor: pointer;
+}
+.btn:hover { border-color: #c8cde0; }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { background: #2f49d1; }
+.btn-danger-ghost { color: var(--red); border-color: #f0c6ca; }
+.btn-sm { padding: 5px 10px; font-size: 11.5px; }
+.btn:disabled { opacity: 0.45; cursor: default; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px;
+}
+.chip-green { background: var(--green-soft); color: var(--green); }
+.chip-amber { background: var(--amber-soft); color: var(--amber); }
+.chip-grey { background: #eef0f6; color: var(--ink-soft); }
+.chip-purple { background: #f0ebfd; color: var(--purple); }
+.chip-red { background: var(--red-soft); color: var(--red); }
+
+/* ---------- Landing ---------- */
+.landing {
+  min-height: calc(100vh - 46px);
+  background:
+    radial-gradient(ellipse 60% 45% at 25% 85%, rgba(214,69,80,0.28), transparent),
+    radial-gradient(ellipse 55% 45% at 78% 80%, rgba(123,92,240,0.4), transparent),
+    radial-gradient(ellipse 70% 55% at 50% 25%, rgba(61,90,241,0.25), transparent),
+    #0b0d24;
+  color: #fff; padding: 48px 30px 60px; text-align: center;
+  position: relative; overflow: hidden;
+}
+.landing h1 { font-size: 46px; font-weight: 600; margin-bottom: 14px; }
+.landing-kicker { font-size: 12px; font-weight: 700; letter-spacing: 3px; color: #9aa8f5; margin-bottom: 34px; }
+.signal-row { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 60px; }
+.signal-pill {
+  border: 1px solid rgba(255,255,255,0.35); border-radius: 12px;
+  padding: 13px 34px; font-weight: 700; font-size: 14.5px;
+  background: rgba(255,255,255,0.04); backdrop-filter: blur(4px);
+}
+.layer-row { display: flex; gap: 26px; justify-content: center; flex-wrap: wrap; }
+.layer-card {
+  width: 265px; text-align: left; border-radius: 18px; padding: 26px 22px;
+  background: rgba(8,10,30,0.75);
+  border: 1px solid rgba(123,92,240,0.55);
+  box-shadow: 0 0 40px rgba(123,92,240,0.25);
+  cursor: pointer; transition: transform .15s ease, box-shadow .15s ease;
+}
+.layer-card:hover { transform: translateY(-4px); box-shadow: 0 0 55px rgba(123,92,240,0.45); }
+.layer-card.pulse-card { border-color: rgba(214,69,80,0.6); box-shadow: 0 0 40px rgba(214,69,80,0.2); }
+.layer-icon { font-size: 34px; margin-bottom: 16px; }
+.layer-card h3 { font-size: 17px; margin-bottom: 8px; }
+.layer-tag { font-size: 10.5px; font-weight: 700; letter-spacing: 1.6px; color: #9aa8f5; margin-bottom: 12px; }
+.layer-card p { font-size: 13px; line-height: 1.55; color: #c5c9e8; }
+.landing-hint { margin-top: 44px; font-size: 12.5px; color: #8b90b5; }
+.arch-flow {
+  display: flex; align-items: center; justify-content: center; gap: 14px;
+  margin-top: 46px; flex-wrap: wrap;
+}
+.arch-node {
+  display: flex; flex-direction: column; align-items: center; gap: 3px;
+  border: 1px solid rgba(154,168,245,0.4); border-radius: 10px;
+  padding: 12px 20px; font-size: 13.5px; font-weight: 700; color: #e8eaf6;
+  background: rgba(255,255,255,0.03);
+}
+.arch-node small { font-size: 10px; font-weight: 500; color: #9aa8f5; letter-spacing: 0.3px; }
+.arch-node-accent { border-color: rgba(123,92,240,0.7); box-shadow: 0 0 22px rgba(123,92,240,0.3); }
+.arch-arrow { font-size: 18px; color: #6d7098; }
+
+/* ---------- Security Pulse ---------- */
+.context-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+.context-card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  padding: 13px 14px; cursor: pointer; text-align: left; font: inherit;
+}
+.context-card .cc-icon { font-size: 15px; margin-bottom: 7px; display: block; }
+.context-card h4 { font-size: 12.5px; margin-bottom: 4px; }
+.context-card p { font-size: 10.5px; color: var(--ink-soft); line-height: 1.45; }
+.context-card.selected { background: var(--accent); border-color: var(--accent); }
+.context-card.selected h4, .context-card.selected p, .context-card.selected .cc-icon { color: #fff; }
+
+.tab-row { display: inline-flex; background: #eef0f6; border-radius: 9px; padding: 3px; margin-bottom: 18px; }
+.tab-row button {
+  border: none; background: none; font: inherit; font-size: 12.5px; font-weight: 600;
+  padding: 7px 16px; border-radius: 7px; cursor: pointer; color: var(--ink-soft);
+}
+.tab-row button.active { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(20,25,60,0.12); }
+
+.pulse-grid { display: grid; grid-template-columns: 1fr 300px; gap: 18px; align-items: start; }
+
+.scatter-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+.scatter-head h3 { font-size: 14.5px; }
+.scatter-sub { font-size: 11.5px; color: var(--ink-soft); margin-bottom: 14px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button {
+  border: none; background: var(--card); font: inherit; font-size: 11.5px; font-weight: 600;
+  padding: 6px 12px; cursor: pointer; color: var(--ink-soft);
+}
+.seg button.active { background: var(--ink); color: #fff; }
+
+.quad-legend { display: flex; flex-direction: column; gap: 12px; }
+.quad-item { display: flex; gap: 9px; font-size: 11px; color: var(--ink-soft); line-height: 1.45; }
+.quad-dot { width: 9px; height: 9px; border-radius: 50%; margin-top: 3px; flex-shrink: 0; }
+.quad-item b { color: var(--ink); font-size: 11.5px; }
+.analyst-note {
+  margin-top: 16px; background: #f0ebfd; border: 1px solid #ddd2f8; border-radius: 10px;
+  padding: 13px; font-size: 11.5px; line-height: 1.55; color: #4a3d80;
+}
+.analyst-note h5 { font-size: 10px; letter-spacing: 1.2px; margin-bottom: 7px; color: var(--purple); }
+
+/* risk matrix */
+.matrix-controls { display: flex; gap: 10px; justify-content: flex-end; margin-bottom: 12px; }
+.matrix-controls label { font-size: 10px; font-weight: 700; letter-spacing: 1px; color: var(--ink-soft); align-self: center; }
+.matrix-controls select {
+  font: inherit; font-size: 12px; padding: 6px 8px; border-radius: 7px;
+  border: 1px solid var(--line); background: var(--card);
+}
+table.matrix { width: 100%; border-collapse: separate; border-spacing: 4px 4px; }
+table.matrix th {
+  font-size: 10.5px; letter-spacing: 0.8px; color: var(--ink-soft); font-weight: 700;
+  text-align: center; padding: 6px 4px; text-transform: uppercase;
+}
+table.matrix th.rowhead { text-align: left; }
+table.matrix td { padding: 0; }
+table.matrix td.rowlabel { font-size: 12.5px; font-weight: 600; padding-right: 10px; white-space: nowrap; }
+table.matrix td.rowlabel span { font-weight: 400; font-size: 10.5px; color: var(--ink-soft); margin-left: 6px; }
+.heat {
+  display: block; text-align: center; font-size: 12.5px; font-weight: 600;
+  padding: 10px 0; border-radius: 7px; border: 1px solid rgba(0,0,0,0.06);
+}
+
+/* ---------- Admin catalog ---------- */
+.catalog-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.filter-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+.filter-pill {
+  border: 1px solid var(--line); background: var(--card); font: inherit; font-size: 11.5px;
+  font-weight: 600; padding: 5px 12px; border-radius: 20px; cursor: pointer; color: var(--ink-soft);
+}
+.filter-pill.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+.filter-gap { width: 14px; }
+.module-row {
+  display: flex; justify-content: space-between; align-items: center; gap: 14px;
+  background: var(--card); border: 1px solid var(--line); border-radius: 11px;
+  padding: 14px 16px; margin-bottom: 10px;
+}
+.module-info h4 { font-size: 13.5px; display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+.module-meta { font-size: 11px; color: var(--ink-soft); margin-bottom: 4px; }
+.module-meta code {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; background: #eef0f6;
+  padding: 2px 6px; border-radius: 5px; margin-right: 8px;
+}
+.module-desc { font-size: 11.5px; color: var(--ink-soft); }
+.module-actions { display: flex; gap: 7px; flex-shrink: 0; }
+
+/* ---------- Orchestrator ---------- */
+.orch-grid { display: grid; grid-template-columns: 360px 1fr; gap: 20px; align-items: start; }
+.orch-step { margin-bottom: 16px; }
+.orch-step h4 { font-size: 10.5px; letter-spacing: 1.3px; color: var(--ink-soft); margin-bottom: 10px; }
+.orch-step textarea {
+  width: 100%; font: inherit; font-size: 12px; padding: 10px; border-radius: 9px;
+  border: 1px solid var(--line); resize: vertical; min-height: 74px;
+  font-family: 'JetBrains Mono', monospace; color: var(--accent);
+}
+.pill-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.pill-row .filter-pill.small { font-size: 11px; padding: 4px 11px; }
+.format-opt {
+  display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line);
+  border-radius: 10px; padding: 11px 12px; margin-bottom: 8px; cursor: pointer;
+  background: var(--card);
+}
+.format-opt.checked { border-color: var(--accent); background: var(--accent-soft); }
+.format-opt input { margin-top: 3px; }
+.format-opt h5 { font-size: 12.5px; margin-bottom: 3px; }
+.format-opt p { font-size: 11px; color: var(--ink-soft); line-height: 1.45; }
+.empty-state { text-align: center; color: var(--ink-soft); padding: 90px 20px; font-size: 12.5px; }
+.empty-state .es-icon { font-size: 30px; margin-bottom: 12px; opacity: 0.5; }
+.gen-result { margin-bottom: 14px; }
+.gen-result-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.gen-result-head h4 { font-size: 13px; display: flex; align-items: center; gap: 8px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); }
+.gen-quote {
+  border-left: 3px solid var(--line); padding: 8px 12px; font-size: 12px;
+  color: var(--ink-soft); font-style: italic; margin-bottom: 10px; line-height: 1.5;
+}
+.gen-url {
+  display: flex; gap: 8px; margin-bottom: 10px;
+}
+.gen-url code {
+  flex: 1; font-family: 'JetBrains Mono', monospace; font-size: 10px; background: #eef0f6;
+  padding: 8px 10px; border-radius: 7px; overflow: hidden; text-overflow: ellipsis;
+  white-space: nowrap; color: var(--ink-soft);
+}
+.big-cta { display: block; width: 100%; text-align: center; margin-bottom: 8px; padding: 11px; font-size: 13px; }
+.spin {
+  width: 15px; height: 15px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff;
+  border-radius: 50%; display: inline-block; vertical-align: -3px; margin-right: 8px;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.inferred-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+
+/* ---------- Command centre ---------- */
+.wizard-steps { display: flex; gap: 8px; margin-bottom: 24px; }
+.wstep {
+  flex: 1; text-align: center; font-size: 12.5px; font-weight: 600; padding: 10px;
+  border-radius: 9px; border: 1px solid var(--line); background: var(--card); color: var(--ink-soft);
+}
+.wstep.done { background: var(--green-soft); border-color: #bfe8d8; color: var(--green); }
+.wstep.current { background: #e7ebfd; border-color: #c3cdf8; color: var(--accent); }
+.field { margin-bottom: 16px; }
+.field label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; }
+.field .hint { font-size: 11px; color: var(--ink-soft); font-weight: 400; margin-bottom: 6px; }
+.field input[type='text'], .field input[type='email'] {
+  width: 100%; font: inherit; font-size: 13px; padding: 10px 12px;
+  border-radius: 9px; border: 1px solid var(--line);
+}
+.audience-tabs { display: flex; gap: 6px; margin-bottom: 14px; }
+.wizard-nav { display: flex; justify-content: space-between; margin-top: 22px; }
+.compose-toolbar {
+  display: flex; gap: 4px; border: 1px solid var(--line); border-bottom: none;
+  border-radius: 9px 9px 0 0; padding: 7px 9px; background: #fafbfe;
+}
+.compose-toolbar span {
+  font-size: 11px; font-weight: 700; color: var(--ink-soft); padding: 3px 7px;
+  border-radius: 5px; cursor: default;
+}
+.compose-body {
+  border: 1px solid var(--line); border-radius: 0 0 9px 9px; padding: 14px;
+  font-size: 13px; line-height: 1.65; background: var(--card);
+}
+.compose-img {
+  margin-top: 12px; border-radius: 9px; height: 130px;
+  background: linear-gradient(140deg, #0d2136, #14496b 55%, #d97b28);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 12px; letter-spacing: 1px; font-weight: 600;
+}
+.stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
+.stat-card { background: var(--card); border: 1px solid var(--line); border-radius: 11px; padding: 18px; text-align: center; }
+.stat-card .num { font-size: 26px; font-weight: 700; }
+.stat-card .num.green { color: var(--green); }
+.stat-card .lbl { font-size: 10px; letter-spacing: 1.2px; color: var(--ink-soft); font-weight: 700; margin-top: 5px; }
+.donut-wrap { display: flex; gap: 24px; align-items: center; }
+.campaign-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 30px; font-size: 12px; }
+.campaign-info-grid div { color: var(--ink-soft); }
+.campaign-info-grid b { color: var(--ink); font-weight: 600; }
+
+/* ---------- Teams mock ---------- */
+.teams { display: flex; min-height: calc(100vh - 46px); background: #f5f5f5; color: #242424; }
+.teams-rail {
+  width: 68px; background: #2b2b3d; padding: 14px 0; display: flex; flex-direction: column;
+  align-items: center; gap: 6px; font-size: 10px; color: #c8c6d4;
+}
+.teams-rail .rail-logo {
+  width: 34px; height: 34px; border-radius: 9px; background: linear-gradient(135deg, #6264a7, #464775);
+  display: flex; align-items: center; justify-content: center; font-size: 15px; margin-bottom: 14px; color: #fff;
+}
+.rail-item { text-align: center; cursor: default; padding: 7px 8px; border-radius: 6px; width: 52px; }
+.rail-item.active { background: rgba(255,255,255,0.09); color: #fff; }
+.rail-item .ri-icon { font-size: 17px; display: block; margin-bottom: 3px; }
+.teams-sidebar { width: 260px; background: #faf9f8; border-right: 1px solid #e1dfdd; padding: 14px 0; font-size: 13.5px; }
+.teams-ws { font-weight: 800; font-size: 17px; padding: 0 16px 14px; color: #242424; }
+.teams-section { padding: 4px 16px; color: #616161; font-size: 11.5px; font-weight: 700; letter-spacing: 0.4px; text-transform: uppercase; margin-top: 14px; }
+.teams-chan { padding: 5px 16px 5px 24px; cursor: default; color: #424242; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.teams-chan.active { background: #e1dfea; color: #242424; border-left: 3px solid #6264a7; padding-left: 21px; font-weight: 600; }
+.teams-main { flex: 1; display: flex; flex-direction: column; background: #fff; }
+.teams-header {
+  padding: 12px 20px; border-bottom: 1px solid #e1dfdd; font-weight: 700; color: #242424;
+  display: flex; align-items: center; gap: 8px; font-size: 15px;
+}
+.teams-msgs { flex: 1; padding: 22px 26px; }
+.teams-day {
+  text-align: center; font-size: 11.5px; font-weight: 700; color: #616161;
+  border-bottom: 1px solid #e1dfdd; line-height: 0.1; margin: 10px 0 26px;
+}
+.teams-day span { background: #fff; padding: 0 12px; }
+.teams-msg { display: flex; gap: 10px; }
+.teams-avatar {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  background: linear-gradient(135deg, #6264a7, #464775);
+  display: flex; align-items: center; justify-content: center; font-size: 19px; color: #fff;
+}
+.teams-msg-head { display: flex; align-items: baseline; gap: 7px; margin-bottom: 4px; }
+.teams-msg-head b { color: #242424; font-size: 14px; }
+.teams-app-badge { font-size: 9px; font-weight: 700; background: #f0eefa; color: #6264a7; padding: 2px 5px; border-radius: 3px; }
+.teams-time { font-size: 11px; color: #8a8886; }
+.teams-bubble {
+  background: #f5f5f5; border-radius: 0 8px 8px 8px; padding: 12px 14px;
+  font-size: 13.5px; line-height: 1.6; max-width: 620px; color: #242424;
+}
+.teams-bubble a { color: #6264a7; text-decoration: none; cursor: pointer; font-weight: 600; }
+.teams-bubble a:hover { text-decoration: underline; }
+.teams-img {
+  margin-top: 12px; width: 420px; height: 200px; border-radius: 10px;
+  background: linear-gradient(140deg, #2b2b3d, #464775 55%, #6264a7);
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 12px; letter-spacing: 1px; font-weight: 600;
+}
+.teams-composer {
+  margin: 0 26px 24px; border: 1px solid #e1dfdd; border-radius: 10px; padding: 11px 14px;
+  color: #8a8886; font-size: 13.5px; background: #fff;
+}
+
+/* ---------- Cipher Letter simulation ---------- */
+.sim-shell { max-width: 900px; margin: 0 auto; padding: 26px 20px 60px; }
+.sim-topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+.sim-topbar h2 { font-size: 15px; display: flex; gap: 10px; align-items: center; }
+.attack-banner {
+  background: var(--red); color: #fff; font-weight: 700; text-align: center;
+  border-radius: 10px; padding: 13px; margin-bottom: 18px; font-size: 14.5px;
+}
+.mail-window {
+  background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: 0 10px 34px rgba(20,25,60,0.10); overflow: hidden;
+}
+.mail-chrome { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line); }
+.mail-logo { font-weight: 800; color: var(--purple); font-size: 15px; }
+.mail-search {
+  flex: 1; background: var(--paper); border-radius: 7px; padding: 7px 12px;
+  font-size: 12px; color: var(--ink-soft);
+}
+.mail-body { display: flex; }
+.mail-nav { width: 150px; border-right: 1px solid var(--line); padding: 14px 0; font-size: 12.5px; }
+.mail-nav div { padding: 6px 16px; color: var(--ink-soft); display: flex; justify-content: space-between; }
+.mail-nav div.active { color: var(--accent); font-weight: 700; background: var(--accent-soft); }
+.mail-content { flex: 1; padding: 20px 24px; }
+.mail-content h3 { font-size: 16.5px; margin-bottom: 14px; }
+.mail-from { display: flex; gap: 10px; align-items: center; margin-bottom: 16px; }
+.mail-from-avatar {
+  width: 36px; height: 36px; border-radius: 50%; background: #1e6e54; color: #fff;
+  display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700;
+}
+.mail-from b { font-size: 13px; display: block; }
+.mail-from-addr {
+  font-size: 11px; color: var(--ink-soft); background: #eef0f6; border-radius: 5px;
+  padding: 2px 7px; display: inline-block; margin-top: 3px;
+}
+.mail-date { margin-left: auto; font-size: 11.5px; color: var(--ink-soft); }
+.mail-text { font-size: 13px; line-height: 1.7; color: #333a52; margin-bottom: 20px; }
+.mail-text code { font-family: 'JetBrains Mono', monospace; background: #eef0f6; padding: 1px 6px; border-radius: 4px; }
+.choice {
+  display: flex; gap: 12px; align-items: center; width: 100%; text-align: left;
+  border: 1px solid var(--line); background: var(--card); border-radius: 10px;
+  padding: 13px 15px; margin-bottom: 9px; font: inherit; font-size: 13px; cursor: pointer;
+}
+.choice:hover { border-color: var(--accent); background: var(--accent-soft); }
+.choice .key {
+  width: 24px; height: 24px; border-radius: 6px; border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center; font-size: 11.5px; font-weight: 700;
+  flex-shrink: 0; background: var(--paper);
+}
+.choice.picked-good { border-color: var(--green); background: var(--green-soft); }
+.choice.picked-bad { border-color: var(--red); background: var(--red-soft); }
+.sim-actions { display: flex; gap: 10px; justify-content: center; padding: 18px; border-top: 1px solid var(--line); }
+.coach-box {
+  margin: 0 18px 18px; border: 1px solid #d8dcf8; background: #f3f5fe; border-radius: 10px; padding: 14px 16px;
+}
+.coach-box h5 { font-size: 10.5px; letter-spacing: 1.2px; color: var(--accent); margin-bottom: 7px; }
+.coach-box p { font-size: 12.5px; line-height: 1.6; color: #3c4370; }
+.coach-rate { margin-top: 9px; display: flex; gap: 7px; }
+
+.redflags { display: grid; grid-template-columns: 1fr 340px; gap: 18px; margin-top: 18px; align-items: start; }
+.flag-item {
+  display: flex; gap: 10px; align-items: flex-start; border: 1px solid var(--line);
+  border-radius: 10px; padding: 11px 13px; margin-bottom: 8px; cursor: pointer; font-size: 12.5px;
+  background: var(--card);
+}
+.flag-item.ticked { border-color: var(--red); background: var(--red-soft); }
+.flag-item input { margin-top: 2px; }
+
+.persona-quad { max-width: 620px; margin: 26px auto; text-align: center; }
+.persona-grid {
+  display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 150px 150px;
+  gap: 4px; position: relative; margin: 18px 0 8px;
+}
+.pq-cell { border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 5px; font-size: 12.5px; font-weight: 700; }
+.pq-cell span { font-size: 24px; }
+.pq-you {
+  position: absolute; width: 46px; height: 46px; border-radius: 50%;
+  background: var(--red); color: #fff; display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; border: 3px solid #fff; box-shadow: 0 4px 14px rgba(214,69,80,0.5);
+}
+.pq-axis { font-size: 10.5px; color: var(--ink-soft); display: flex; justify-content: space-between; padding: 0 20px; }
+.persona-result {
+  margin-top: 18px; background: var(--card); border: 1px solid var(--line);
+  border-radius: 12px; padding: 18px; text-align: left; font-size: 13px; line-height: 1.6;
+}
+
+/* ---------- Ampliverse ---------- */
+.amplify-shell { display: flex; min-height: calc(100vh - 46px); }
+.amplify-side { width: 215px; background: #0d1028; border-right: 1px solid var(--dark-line); padding: 20px 14px; }
+.amplify-side .as-brand { color: #f2b64c; font-weight: 800; font-size: 12.5px; letter-spacing: 1.5px; margin-bottom: 22px; }
+.amplify-side .sidebar-section { color: #5c6191; }
+.amplify-item {
+  display: block; width: 100%; text-align: left; background: none; border: none; font: inherit;
+  font-size: 13px; color: #b7bce0; padding: 8px 10px; border-radius: 8px; cursor: pointer;
+}
+.amplify-item:hover { background: rgba(255,255,255,0.06); }
+.amplify-item.active { background: rgba(53,195,169,0.18); color: #35c3a9; font-weight: 600; }
+.amplify-main { flex: 1; padding: 26px 32px; position: relative; }
+.welcome-hero {
+  background: linear-gradient(120deg, rgba(53,195,169,0.85), rgba(23,97,131,0.75));
+  border-radius: 14px; padding: 26px 28px; margin-bottom: 26px; color: #fff;
+}
+.welcome-hero h1 { font-size: 22px; margin-bottom: 8px; }
+.welcome-hero p { font-size: 13px; opacity: 0.9; max-width: 560px; line-height: 1.55; }
+.avail-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.avail-head h4 { font-size: 10.5px; letter-spacing: 1.5px; color: var(--dark-muted); }
+.avail-head span { font-size: 11.5px; color: var(--dark-muted); }
+.collection-tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+.ctab {
+  border: 1px solid var(--dark-line); background: none; color: var(--dark-muted); font: inherit;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 1.2px; padding: 6px 13px;
+  border-radius: 20px; cursor: pointer;
+}
+.ctab.active { background: #35c3a9; border-color: #35c3a9; color: #04211a; }
+.mod-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 14px; }
+.mod-card { background: var(--dark-card); border: 1px solid var(--dark-line); border-radius: 12px; padding: 16px; }
+.mod-card .tag { font-size: 9.5px; font-weight: 800; letter-spacing: 1.4px; color: #35c3a9; margin-bottom: 9px; display: block; }
+.mod-card h4 { font-size: 14px; margin-bottom: 7px; color: #fff; }
+.mod-card p { font-size: 11.5px; color: var(--dark-muted); line-height: 1.5; margin-bottom: 14px; }
+.mod-card-foot { display: flex; justify-content: space-between; align-items: center; font-size: 11px; color: var(--dark-muted); }
+.mod-card-foot button { background: none; border: none; color: #35c3a9; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.galaxy-toggle { position: absolute; top: 26px; right: 32px; display: flex; gap: 8px; align-items: center; }
+
+.galaxy {
+  position: relative; height: calc(100vh - 46px); overflow: hidden;
+  background: radial-gradient(ellipse at 60% 40%, #191d3f 0%, #0b0d1e 60%, #06070f 100%);
+}
+.star { position: absolute; border-radius: 50%; background: #cdd3ff; }
+.star-big {
+  background: #fff; border-radius: 50%;
+  box-shadow: 0 0 6px 2px rgba(255,255,255,0.55), 0 0 14px 4px rgba(180,190,255,0.25);
+  animation-name: star-twinkle; animation-timing-function: ease-in-out; animation-iteration-count: infinite;
+}
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.45; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.35); }
+}
+
+/* nebula + comet ambience */
+.nebula { position: absolute; border-radius: 50%; filter: blur(60px); opacity: 0.35; z-index: 1; pointer-events: none; }
+.nebula-a { width: 380px; height: 300px; left: 8%; top: 10%; background: radial-gradient(circle, #6d3fd6, transparent 70%); }
+.nebula-b { width: 320px; height: 280px; right: 6%; bottom: 6%; background: radial-gradient(circle, #1f7a9c, transparent 70%); }
+.comet {
+  position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff;
+  box-shadow: 0 0 6px 1px #fff, -80px 20px 18px 2px rgba(255,255,255,0.35);
+  opacity: 0; z-index: 2; animation: comet-fly 9s linear infinite;
+}
+.comet-a { top: 14%; left: -5%; animation-delay: 1s; }
+.comet-b { top: 60%; left: -5%; animation-delay: 5.5s; }
+.comet-c { top: 82%; left: -5%; animation-delay: 3.2s; animation-duration: 7s; }
+@keyframes comet-fly {
+  0% { transform: translate(0, 0); opacity: 0; }
+  4% { opacity: 1; }
+  22% { transform: translate(60vw, 26vh); opacity: 0; }
+  100% { transform: translate(60vw, 26vh); opacity: 0; }
+}
+
+/* galaxy backdrop set-piece */
+.galaxy-core-glow {
+  position: absolute; width: 900px; height: 900px; left: 44%; top: 57%; transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(139,63,240,0.16), rgba(226,118,45,0.08) 40%, transparent 70%);
+  filter: blur(10px); z-index: 0; pointer-events: none;
+}
+.galaxy-spiral {
+  position: absolute; width: 1100px; height: 1100px; left: 44%; top: 57%; transform: translate(-50%, -50%);
+  z-index: 0; pointer-events: none; opacity: 0.5; border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 0deg, rgba(139,63,240,0.14) 40deg, transparent 90deg, transparent 180deg, rgba(53,195,169,0.12) 220deg, transparent 270deg, transparent 360deg);
+  animation: spiral-spin 120s linear infinite;
+}
+@keyframes spiral-spin { from { transform: translate(-50%, -50%) rotate(0deg); } to { transform: translate(-50%, -50%) rotate(360deg); } }
+.tier-orbits { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+
+.galaxy-hud {
+  position: absolute; top: 0; left: 0; right: 0; padding: 14px 24px 8px;
+  display: flex; align-items: center; gap: 22px; z-index: 5; flex-wrap: wrap;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1.5px;
+}
+.galaxy-hud .hud-brand { color: #f2994a; font-weight: 700; }
+.galaxy-hud .hud-tab { color: #6d7098; }
+.galaxy-hud .hud-tab.on { color: #e8eaf6; background: rgba(255,255,255,0.08); padding: 4px 10px; border-radius: 5px; }
+.galaxy-hud .hud-streak {
+  margin-left: auto; color: #ff9d5c; font-weight: 700; background: rgba(255,157,92,0.12);
+  padding: 4px 10px; border-radius: 5px;
+}
+.galaxy-subbar {
+  position: absolute; top: 46px; left: 24px; right: 24px; z-index: 5;
+  display: flex; align-items: center; gap: 12px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 1px;
+}
+.galaxy-level-badge {
+  color: #0b0d1e; background: linear-gradient(120deg, #f2b64c, #ff9d5c);
+  font-weight: 800; padding: 3px 10px; border-radius: 20px; letter-spacing: 1px; white-space: nowrap;
+}
+.galaxy-xpbar { width: 160px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+.galaxy-xpbar-fill { height: 100%; background: linear-gradient(90deg, #f2994a, #f2b64c); border-radius: 4px; }
+.galaxy-xp-label { color: #8b90b5; }
+
+.planet-wrap { position: absolute; text-align: center; cursor: pointer; z-index: 4; }
+.planet-wrap.locked { cursor: pointer; opacity: 0.85; }
+.orbit-ring {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  border: 1px dashed rgba(255,255,255,0.12); border-radius: 50%; z-index: -1;
+}
+.planet { border-radius: 50%; margin: 0 auto; position: relative; z-index: 1; transition: transform 0.25s ease, box-shadow 0.25s ease; }
+.planet-wrap:not(.locked):hover .planet { transform: scale(1.12); filter: brightness(1.15); }
+.planet-wrap:not(.locked):hover .planet-label { color: #fff !important; }
+.planet-ring {
+  position: absolute; inset: -14px; border: 1px solid rgba(255,255,255,0.35);
+  border-radius: 50%; overflow: visible;
+}
+.planet-ring-belt {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-16deg);
+  border: 2px solid rgba(255,255,255,0.3); border-radius: 50%; z-index: 0; pointer-events: none;
+}
+.crater { position: absolute; border-radius: 50%; background: rgba(0,0,0,0.28); }
+.planet-shine {
+  position: absolute; top: 8%; left: 14%; width: 42%; height: 30%; border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,0.35), transparent 70%);
+}
+.planet-clouds {
+  position: absolute; inset: 0; border-radius: 50%; opacity: 0.5;
+  background:
+    radial-gradient(ellipse 26px 9px at 30% 70%, rgba(255,255,255,0.55), transparent 70%),
+    radial-gradient(ellipse 20px 8px at 65% 35%, rgba(255,255,255,0.4), transparent 70%);
+}
+.moon {
+  position: absolute; width: 8px; height: 8px; border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #d7dbf5, #8b90b5);
+  animation: moon-bob 5s ease-in-out infinite;
+}
+@keyframes moon-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.planet-lock {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 15px; opacity: 0.8;
+}
+.planet-cleared {
+  position: absolute; top: -4px; right: -4px; width: 18px; height: 18px; border-radius: 50%;
+  background: #35c3a9; color: #0b0d1e; font-size: 11px; font-weight: 800;
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 0 10px rgba(53,195,169,0.7);
+}
+.planet-label {
+  margin-top: 12px; font-family: 'JetBrains Mono', monospace; font-size: 9.5px;
+  letter-spacing: 2px; font-weight: 700;
+}
+.planet-progress { width: 46px; height: 3px; margin: 5px auto 0; background: rgba(255,255,255,0.12); border-radius: 3px; overflow: hidden; }
+.planet-progress-fill { height: 100%; border-radius: 3px; }
+.planet-level-dots { display: flex; gap: 4px; justify-content: center; margin-top: 5px; }
+.plvl-dot { width: 5px; height: 5px; border-radius: 50%; background: rgba(255,255,255,0.15); }
+.plvl-dot.on { box-shadow: 0 0 5px currentColor; }
+
+/* gamified side panels: missions / achievements / leaderboard */
+.panel-grid {
+  position: absolute; top: 96px; left: 40px; right: 40px; bottom: 110px; z-index: 5;
+  overflow-y: auto; max-width: 640px;
+}
+.panel-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; }
+.panel-head h3 {
+  font-family: 'JetBrains Mono', monospace; font-size: 14px; letter-spacing: 2px; color: #e8eaf6;
+}
+.panel-sub { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #8b90b5; }
+
+.quest-card {
+  display: flex; align-items: center; gap: 12px; padding: 12px 14px; margin-bottom: 8px;
+  background: rgba(21,24,51,0.75); border: 1px solid var(--dark-line); border-radius: 10px;
+  backdrop-filter: blur(3px);
+}
+.quest-card.done { opacity: 0.55; }
+.quest-card.locked { opacity: 0.45; }
+.quest-icon { font-size: 20px; flex-shrink: 0; }
+.quest-body { flex: 1; min-width: 0; }
+.quest-title { font-size: 12.5px; color: #e8eaf6; }
+.quest-progress { width: 100%; height: 4px; margin-top: 6px; background: rgba(255,255,255,0.1); border-radius: 4px; overflow: hidden; }
+.quest-progress-fill { height: 100%; background: linear-gradient(90deg, #ff9d5c, #f2b64c); border-radius: 4px; }
+.quest-xp { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #f2b64c; font-weight: 700; flex-shrink: 0; }
+.quest-status { font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; padding: 3px 8px; border-radius: 20px; flex-shrink: 0; }
+.quest-status.done { background: rgba(53,195,169,0.18); color: #35c3a9; }
+.quest-status.active { background: rgba(242,182,76,0.18); color: #f2b64c; }
+.quest-status.locked { background: rgba(139,144,181,0.15); color: #8b90b5; }
+
+.badge-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+.badge-card {
+  background: rgba(21,24,51,0.75); border: 1px solid var(--dark-line); border-radius: 12px;
+  padding: 16px 12px; text-align: center; backdrop-filter: blur(3px);
+}
+.badge-card.locked { opacity: 0.4; }
+.badge-card.earned { border-color: rgba(242,182,76,0.45); box-shadow: 0 0 16px rgba(242,182,76,0.12); }
+.badge-icon { font-size: 26px; margin-bottom: 8px; }
+.badge-title { font-size: 11.5px; font-weight: 700; color: #e8eaf6; margin-bottom: 4px; }
+.badge-desc { font-size: 10px; color: #8b90b5; line-height: 1.4; }
+
+.lb-row {
+  display: flex; align-items: center; gap: 12px; padding: 9px 14px; margin-bottom: 6px;
+  background: rgba(21,24,51,0.75); border: 1px solid var(--dark-line); border-radius: 10px;
+  backdrop-filter: blur(3px);
+}
+.lb-row.you { border-color: rgba(242,182,76,0.5); background: rgba(242,182,76,0.08); }
+.lb-rank { width: 26px; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #8b90b5; flex-shrink: 0; text-align: center; }
+.lb-avatar {
+  width: 26px; height: 26px; border-radius: 50%; background: linear-gradient(135deg, #6264a7, #464775);
+  color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.lb-name { font-size: 12.5px; color: #e8eaf6; width: 150px; flex-shrink: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lb-bar { flex: 1; height: 5px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; }
+.lb-bar-fill { height: 100%; background: linear-gradient(90deg, #f2994a, #f2b64c); border-radius: 4px; }
+.lb-xp { font-family: 'JetBrains Mono', monospace; font-size: 10.5px; color: #f2b64c; font-weight: 700; width: 78px; text-align: right; flex-shrink: 0; }
+
+.mission-locked {
+  font-size: 11px; line-height: 1.7; color: #8b90b5; letter-spacing: 0.5px;
+}
+.mission-locked b { color: #f2b64c; }
+
+.mission-panel {
+  position: absolute; top: 96px; right: 40px; width: 300px; z-index: 6;
+  border: 1px solid rgba(242,182,76,0.5); background: rgba(10,10,22,0.88);
+  border-radius: 4px; padding: 20px; font-family: 'JetBrains Mono', monospace;
+  color: #f2b64c; backdrop-filter: blur(4px);
+}
+.mission-panel h3 { font-size: 15px; letter-spacing: 3px; margin-bottom: 16px; }
+.mission-stats { display: flex; justify-content: space-between; margin-bottom: 16px; text-align: center; }
+.mission-stats .ms { font-size: 19px; font-weight: 700; }
+.mission-stats .ms small { display: block; font-size: 8px; letter-spacing: 1px; color: #8a7346; margin-top: 4px; }
+.mission-mods { list-style: none; margin-bottom: 16px; max-height: 220px; overflow-y: auto; }
+.mission-mods li { font-size: 10px; letter-spacing: 1px; padding: 4px 0; color: #d8b676; }
+.mission-mods li::before { content: '◉ '; color: #f2994a; }
+.mission-tier-badge {
+  display: inline-block; font-size: 9px; letter-spacing: 1.5px; font-weight: 700;
+  padding: 3px 9px; border: 1px solid; border-radius: 20px; margin-bottom: 12px;
+}
+.mission-desc { font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.7; color: #d8b676; margin-bottom: 16px; }
+.mission-done-tag { font-size: 10px; letter-spacing: 1px; color: #35c3a9; margin-bottom: 10px; }
+.mission-launch {
+  display: block; width: 100%; background: #f2b64c; border: none; color: #241a05;
+  font-family: inherit; font-size: 11px; font-weight: 700; letter-spacing: 2px;
+  padding: 11px; cursor: pointer; border-radius: 3px;
+}
+.mission-launch:hover { background: #ffca66; }
+.mascot { position: absolute; left: 30px; bottom: 24px; display: flex; gap: 14px; align-items: flex-end; z-index: 6; }
+.mascot-sprite {
+  width: 86px; height: 86px; border-radius: 50%; font-size: 46px;
+  background: radial-gradient(circle at 35% 30%, #ff9d5c, #d64550);
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 0 34px rgba(255,140,80,0.55);
+  animation: mascot-bob 3.2s ease-in-out infinite;
+}
+@keyframes mascot-bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+.robot-face { display: block; overflow: visible; }
+.robot-eyes { animation: robot-blink 4.5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes robot-blink { 0%, 90%, 100% { transform: scaleY(1); } 94% { transform: scaleY(0.12); } }
+.robot-antenna-dot {
+  transform-box: fill-box; transform-origin: center;
+  animation: robot-pulse 1.7s ease-in-out infinite;
+}
+@keyframes robot-pulse { 0%, 100% { transform: scale(1); opacity: 0.75; } 50% { transform: scale(1.3); opacity: 1; } }
+.mascot-say {
+  font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #c9b28a;
+  line-height: 1.7; letter-spacing: 0.5px; max-width: 260px; padding-bottom: 6px;
+}
+.mascot-say b { color: #f2994a; }
+
+/* linkedin sim modal */
+.modal-back {
+  position: fixed; inset: 0; background: rgba(4,5,15,0.72); z-index: 90;
+  display: flex; align-items: center; justify-content: center; padding: 24px;
+}
+.li-card {
+  background: #f4f2ee; color: #1a1f36; width: 620px; max-width: 100%; border-radius: 12px;
+  overflow: hidden; box-shadow: 0 24px 70px rgba(0,0,0,0.6);
+}
+.li-chrome { background: #fff; padding: 10px 16px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #e0ddd7; }
+.li-logo { background: #0a66c2; color: #fff; font-weight: 800; width: 24px; height: 24px; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.li-body { padding: 20px 24px; max-height: 68vh; overflow-y: auto; }
+.li-banner { height: 64px; border-radius: 8px 8px 0 0; background: linear-gradient(120deg, #90b8d8, #37699b); }
+.li-profile { background: #fff; border-radius: 0 0 8px 8px; padding: 0 18px 16px; margin-bottom: 14px; }
+.li-avatar {
+  width: 74px; height: 74px; border-radius: 50%; border: 3px solid #fff; margin-top: -37px;
+  background: linear-gradient(135deg, #c9a9a1, #8a6f6a); display: flex; align-items: center;
+  justify-content: center; color: #fff; font-size: 24px; font-weight: 700;
+}
+.li-profile h3 { margin-top: 8px; font-size: 17px; }
+.li-role { font-size: 12.5px; color: #4b4f56; margin: 3px 0; }
+.li-loc { font-size: 11.5px; color: #8a8d92; margin-bottom: 10px; }
+.li-stats { display: flex; gap: 20px; font-size: 11.5px; color: #4b4f56; border-top: 1px solid #eee; padding-top: 10px; }
+.li-stats b { display: block; font-size: 14px; color: #1a1f36; }
+.li-section { background: #fff; border-radius: 8px; padding: 14px 18px; margin-bottom: 12px; }
+.li-section h4 { font-size: 13px; margin-bottom: 8px; }
+.li-section p, .li-section li { font-size: 12px; color: #4b4f56; line-height: 1.55; }
+.li-exp { display: flex; gap: 10px; margin-bottom: 10px; }
+.li-exp-logo { width: 34px; height: 34px; border-radius: 5px; background: #e8e6e1; flex-shrink: 0; }
+.li-exp b { font-size: 12.5px; display: block; }
+.li-exp span { font-size: 11px; color: #8a8d92; }
+.li-actions { display: flex; gap: 9px; padding: 14px 24px 20px; background: #f4f2ee; }
+.li-btn { flex: 1; font: inherit; font-size: 12px; font-weight: 700; padding: 10px; border-radius: 20px; cursor: pointer; }
+.li-btn.primary { background: #0a66c2; color: #fff; border: none; }
+.li-btn.ghost { background: none; border: 1px solid #8a8d92; color: #4b4f56; }
+.li-btn.report { background: none; border: 1px solid #d64550; color: #d64550; }
+.li-feedback { margin: 0 24px 20px; border-radius: 9px; padding: 13px 15px; font-size: 12.5px; line-height: 1.55; }
+.li-feedback.good { background: #e2f6ee; border: 1px solid #b5e5d2; color: #0d5c40; }
+.li-feedback.bad { background: #fdeaec; border: 1px solid #f3c2c7; color: #8c2730; }
+
+/* module viewer modal */
+.mv-card {
+  background: #14162c; color: #e8eaf6; width: 640px; max-width: 100%; max-height: 86vh;
+  border-radius: 14px; overflow: hidden; box-shadow: 0 24px 70px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.08); display: flex; flex-direction: column;
+}
+.mv-chrome-bar { display: flex; align-items: center; gap: 10px; padding: 8px 16px; flex-shrink: 0; }
+.mv-chrome-dots { display: flex; gap: 5px; }
+.mv-chrome-dots i { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.55); display: block; }
+.mv-chrome-app { color: #fff; font-size: 11.5px; font-weight: 600; letter-spacing: 0.3px; display: flex; align-items: center; gap: 7px; }
+.mv-chrome-icon {
+  display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px;
+  background: rgba(255,255,255,0.25); border-radius: 4px; font-size: 10.5px; font-weight: 800;
+}
+
+/* light theme (Office apps: Outlook, Word, Excel, PowerPoint) */
+.mv-theme-light { background: #faf9f8; color: #201f1e; }
+.mv-theme-light .mv-head h3 { color: #201f1e; }
+.mv-theme-light .mv-close { background: rgba(0,0,0,0.06); color: #201f1e; }
+.mv-theme-light .mv-progress-label { color: #8a8886; }
+.mv-theme-light .mv-dot { background: rgba(0,0,0,0.14); }
+.mv-theme-light .mv-dot.on { background: var(--mv-accent); box-shadow: 0 0 6px var(--mv-accent); }
+.mv-theme-light .mv-dot.past { background: rgba(33,115,70,0.45); }
+.mv-theme-light .mv-nav-btn { background: rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.14); color: #484644; }
+.mv-theme-light .mv-foot { border-top: 1px solid rgba(0,0,0,0.08); background: rgba(0,0,0,0.02); }
+.mv-theme-light .mv-quiz-question { color: #201f1e; }
+.mv-theme-light .mv-quiz-opt { background: #fff; border: 1px solid rgba(0,0,0,0.15); color: #201f1e; }
+.mv-theme-light .mv-quiz-opt.correct { background: rgba(33,115,70,0.1); border-color: #217346; color: #217346; }
+.mv-theme-light .mv-quiz-opt.wrong { background: rgba(196,62,28,0.08); border-color: #c43e1c; color: #c43e1c; }
+.mv-theme-light .mv-quiz-why { background: rgba(0,0,0,0.03); color: #484644; }
+.mv-theme-light .mv-input-box { background: #fff; border: 1px solid rgba(0,0,0,0.18); color: #201f1e; }
+.mv-theme-light .mv-input-box::placeholder { color: #a19f9d; }
+.mv-theme-light .mv-input-prompt { color: #323130; }
+.mv-theme-light .mv-doc-label { color: #8a8886; }
+.mv-theme-light .mv-matrix th { color: #605e5c; }
+.mv-theme-light .mv-matrix td { border-bottom: 1px solid rgba(0,0,0,0.08); }
+.mv-theme-light .mv-matrix-label { color: #201f1e; }
+.mv-theme-light .mv-info-surface p { white-space: pre-line; }
+
+.mv-next-btn {
+  background: var(--mv-accent); border: none; color: #fff; font: inherit; font-size: 12.5px;
+  font-weight: 700; padding: 9px 20px; border-radius: 6px; cursor: pointer;
+}
+.mv-next-btn:disabled { opacity: 0.35; cursor: default; }
+.mv-next-btn:hover:not(:disabled) { filter: brightness(1.12); }
+
+.mv-doc-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px;
+  color: #6b6f90; margin-bottom: 10px;
+}
+
+/* chat-style info (Teams / Copilot) */
+.mv-chat-row { display: flex; gap: 10px; align-items: flex-start; }
+.mv-chat-avatar {
+  width: 30px; height: 30px; border-radius: 50%; background: rgba(255,255,255,0.08);
+  display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
+}
+.mv-chat-bubble { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0 12px 12px 12px; padding: 14px 16px; flex: 1; }
+.mv-chat-sender { font-size: 10.5px; font-weight: 700; color: var(--mv-accent); margin-bottom: 6px; letter-spacing: 0.3px; }
+.mv-chat-bubble h4 { font-size: 13.5px; color: #f2b64c; margin-bottom: 8px; }
+.mv-chat-bubble p { font-size: 13px; line-height: 1.7; color: #d5d8ef; white-space: pre-line; }
+
+/* Office-app info surfaces */
+.mv-app-outlook .mv-info-surface {
+  background: #fff; border: 1px solid #e1dfdd; border-radius: 6px; padding: 16px 20px; box-shadow: 0 1px 2px rgba(0,0,0,0.06);
+}
+.mv-app-outlook .mv-info-surface h4 { font-size: 15px; color: #201f1e; border-bottom: 1px solid #edebe9; padding-bottom: 8px; margin-bottom: 10px; }
+.mv-app-outlook .mv-info-surface p { color: #323130; font-size: 13px; line-height: 1.7; white-space: pre-line; }
+
+.mv-app-word .mv-info-surface {
+  background: #fff; border: 1px solid #e1dfdd; border-radius: 2px; padding: 30px 38px; box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+}
+.mv-app-word .mv-info-surface h4 { font-size: 17px; color: #2b579a; margin-bottom: 12px; }
+.mv-app-word .mv-info-surface p { color: #201f1e; font-size: 13.5px; line-height: 1.85; white-space: pre-line; font-family: Georgia, 'Times New Roman', serif; }
+
+.mv-app-excel .mv-info-surface {
+  background: #fff; border: 1px solid #d3d3d3; padding: 16px 20px;
+  background-image: linear-gradient(rgba(0,0,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.05) 1px, transparent 1px);
+  background-size: 100% 24px, 14.28% 100%;
+}
+.mv-app-excel .mv-info-surface h4 {
+  font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #217346; background: #e6f2ec;
+  display: inline-block; padding: 3px 8px; border-radius: 3px; margin-bottom: 10px;
+}
+.mv-app-excel .mv-info-surface p { color: #201f1e; font-size: 12.5px; line-height: 1.7; white-space: pre-line; }
+
+.mv-app-powerpoint .mv-info-surface {
+  background: linear-gradient(135deg, #fff, #f7f2f0); border: 1px solid #e1dfdd; border-radius: 6px;
+  padding: 26px 30px; min-height: 200px; display: flex; flex-direction: column; justify-content: center;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.12);
+}
+.mv-app-powerpoint .mv-info-surface h4 { font-size: 19px; color: #c43e1c; margin-bottom: 10px; font-weight: 800; }
+.mv-app-powerpoint .mv-info-surface p { color: #484644; font-size: 13px; line-height: 1.6; white-space: pre-line; }
+
+/* input dock */
+.mv-input-dock { position: relative; }
+.mv-input-send { position: absolute; right: 12px; bottom: 14px; color: var(--mv-accent); font-size: 16px; pointer-events: none; }
+.mv-input-teams .mv-input-box, .mv-input-copilot .mv-input-box { padding-right: 34px; border-radius: 18px; }
+
+.mv-head { display: flex; align-items: flex-start; justify-content: space-between; padding: 20px 24px 0; }
+.mv-head h3 { font-size: 18px; margin-top: 8px; }
+.mv-tier {
+  display: inline-block; font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1.5px;
+  font-weight: 700; padding: 3px 9px; border: 1px solid; border-radius: 20px;
+}
+.mv-close {
+  background: rgba(255,255,255,0.08); border: none; color: #e8eaf6; width: 26px; height: 26px;
+  border-radius: 50%; cursor: pointer; font-size: 12px; flex-shrink: 0;
+}
+.mv-body { padding: 16px 24px; overflow-y: auto; flex: 1; min-height: 220px; }
+.mv-foot {
+  display: flex; align-items: center; justify-content: space-between; padding: 14px 24px;
+  border-top: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02);
+}
+.mv-status { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 1px; color: #8b90b5; }
+.mv-status.done { color: #35c3a9; }
+.mv-nav-btn {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: #9a9fc4;
+  font: inherit; font-size: 11.5px; padding: 9px 16px; border-radius: 8px; cursor: pointer;
+}
+.mv-nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+/* slide progress */
+.mv-progress { display: flex; align-items: center; gap: 5px; padding: 12px 24px 0; }
+.mv-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.15); }
+.mv-dot.past { background: rgba(53,195,169,0.6); }
+.mv-dot.on { background: #f2b64c; box-shadow: 0 0 6px rgba(242,182,76,0.6); }
+.mv-progress-label { margin-left: auto; font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 1px; color: #6b6f90; }
+
+/* info slide */
+.mv-info h4 { font-size: 14px; color: #f2b64c; margin-bottom: 10px; letter-spacing: 0.3px; }
+.mv-info p { font-size: 13.5px; line-height: 1.75; color: #d5d8ef; white-space: pre-line; }
+
+/* input slide */
+.mv-input-prompt { font-size: 13px; line-height: 1.6; color: #d5d8ef; margin-bottom: 12px; }
+.mv-input-box {
+  width: 100%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 9px; color: #e8eaf6; font: inherit; font-size: 12.5px; padding: 12px; resize: vertical;
+}
+.mv-input-box:focus { outline: none; border-color: rgba(242,182,76,0.5); }
+.mv-input-box::placeholder { color: #5a5e7a; }
+
+/* quiz format */
+.mv-quiz-q { margin-bottom: 20px; }
+.mv-quiz-question { font-size: 13px; margin-bottom: 10px; color: #e8eaf6; }
+.mv-quiz-opt {
+  display: block; width: 100%; text-align: left; background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1); color: #d5d8ef; font: inherit; font-size: 12px;
+  padding: 9px 12px; border-radius: 7px; margin-bottom: 6px; cursor: pointer;
+}
+.mv-quiz-opt:disabled { cursor: default; }
+.mv-quiz-opt.correct { background: rgba(53,195,169,0.18); border-color: rgba(53,195,169,0.5); color: #b7ecdf; }
+.mv-quiz-opt.wrong { background: rgba(214,69,80,0.15); border-color: rgba(214,69,80,0.4); color: #f3c2c7; }
+.mv-quiz-why { font-size: 11.5px; color: #9a9fc4; line-height: 1.6; margin-top: 6px; padding: 8px 10px; background: rgba(255,255,255,0.03); border-radius: 7px; }
+
+/* matrix format */
+.mv-matrix { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+.mv-matrix th, .mv-matrix td { padding: 8px 10px; border-bottom: 1px solid rgba(255,255,255,0.08); text-align: center; }
+.mv-matrix th { color: #8b90b5; font-weight: 600; letter-spacing: 0.5px; }
+.mv-matrix-label { text-align: left !important; color: #e8eaf6; font-weight: 600; }
+.mv-matrix-cell.mv-best { color: #f2b64c; font-weight: 700; }
+.mv-matrix-cell.mv-ok { color: #8b90b5; }
+.mv-matrix-cell.mv-no { color: #5a5e7a; }
+
+/* calculator format */
+.mv-calc-intro { font-size: 12.5px; color: #9a9fc4; line-height: 1.6; margin-bottom: 12px; }
+.mv-calc-presets { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 16px; }
+.mv-calc-preset {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #d5d8ef;
+  font: inherit; font-size: 10.5px; padding: 6px 11px; border-radius: 20px; cursor: pointer;
+}
+.mv-calc-preset:hover { background: rgba(242,182,76,0.15); border-color: rgba(242,182,76,0.4); }
+.mv-calc-label { display: block; font-size: 10.5px; letter-spacing: 0.5px; color: #8b90b5; margin-bottom: 8px; }
+.mv-calc-slider { width: 100%; margin-bottom: 16px; }
+.mv-calc-out { display: flex; gap: 10px; margin-bottom: 14px; }
+.mv-calc-stat {
+  flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 9px; padding: 12px; text-align: center;
+}
+.mv-calc-stat b { display: block; font-size: 18px; color: #f2b64c; }
+.mv-calc-stat small { font-size: 9.5px; color: #8b90b5; letter-spacing: 0.5px; }
+.mv-calc-bar { width: 100%; height: 6px; background: rgba(255,255,255,0.08); border-radius: 4px; overflow: hidden; margin-bottom: 6px; }
+.mv-calc-bar-fill { height: 100%; background: linear-gradient(90deg, #4d7ee0, #35c3a9); border-radius: 4px; }
+.mv-calc-bar-label { font-size: 10.5px; color: #8b90b5; margin-bottom: 14px; }
+.mv-calc-note { font-size: 10.5px; color: #6b6f90; line-height: 1.6; }
+
+/* template apply before/after */
+.mv-tpl-compare { display: flex; align-items: center; gap: 12px; }
+.mv-tpl-card { flex: 1; min-width: 0; }
+.mv-tpl-label {
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 1px; color: #8a8886;
+  margin-bottom: 8px; text-align: center;
+}
+.mv-tpl-arrow { font-size: 20px; flex-shrink: 0; opacity: 0.8; }
+.mv-tpl-mini {
+  background: #fff; border: 1px solid #e1dfdd; border-radius: 4px; padding: 16px 14px;
+  aspect-ratio: 16 / 9; display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.mv-tpl-mini-title { font-size: 13px; font-weight: 700; color: #3b3a39; margin-bottom: 8px; font-family: 'Segoe UI', sans-serif; }
+.mv-tpl-mini ul { list-style: disc; padding-left: 16px; margin: 0; flex: 1; }
+.mv-tpl-mini li { font-size: 10px; color: #605e5c; line-height: 1.7; }
+.mv-tpl-branded { border-color: var(--mv-accent); position: relative; overflow: hidden; }
+.mv-tpl-mini-bar { height: 6px; background: var(--mv-accent); margin: -16px -14px 10px; }
+.mv-tpl-branded .mv-tpl-mini-title { color: var(--mv-accent); }
+.mv-tpl-mini-footer { font-size: 7.5px; color: #a19f9d; letter-spacing: 0.3px; margin-top: 6px; border-top: 1px solid #edebe9; padding-top: 5px; }
+
+/* misc */
+.footer-note { text-align: center; font-size: 11px; color: var(--ink-soft); padding: 18px; }
+.app-dark .footer-note { color: var(--dark-muted); }
+
+</style>
+</head>
+<body>
+<div id="root"><div style="font-family:sans-serif;padding:40px;color:#555">Loading demo… (needs internet on first open)</div></div>
+<script type="text/babel" data-presets="react">
+const Landing = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+function Landing({ onNavigate }) {
+  return (
+    <div className="landing">
+      <h1>Amplify</h1>
+      <div className="landing-kicker">PLATFORM ARCHITECTURE</div>
+
+      <div className="signal-row">
+        {['Microsoft Copilot', 'Claude Enterprise', 'Gemini', 'Workday'].map((s) => (
+          <div className="signal-pill" key={s}>{s}</div>
+        ))}
+      </div>
+
+      <div className="landing-hint" style={{ marginTop: -30, marginBottom: 44 }}>
+        connected signal sources — usage telemetry feeds the AI Pulse below
+      </div>
+
+      <div className="layer-row">
+        <div className="layer-card pulse-card" onClick={() => onNavigate('ampliverse')}>
+          <div className="layer-icon">🖥️</div>
+          <h3>Frontend</h3>
+          <div className="layer-tag">LMS INTERFACE</div>
+          <p>The interface employees interact with for learning and experiences — the Ampliverse, delivered through Microsoft Teams and the web.</p>
+        </div>
+        <div className="layer-card" onClick={() => onNavigate('orchestrator')}>
+          <div className="layer-icon">⚙️</div>
+          <h3>Backend</h3>
+          <div className="layer-tag">BUSINESS LOGIC</div>
+          <p>Handles business logic, data, and orchestrates all platform services — the Scenario Orchestrator and Command Centre run here.</p>
+        </div>
+        <div className="layer-card" onClick={() => onNavigate('cipher')}>
+          <div className="layer-icon">🧠</div>
+          <h3>AI Layer</h3>
+          <div className="layer-tag">CONTENT GENERATION</div>
+          <p>Embedded within the backend; responsible for generating learning content, scenarios, and dynamic material served to learners.</p>
+        </div>
+      </div>
+
+      <div className="arch-flow">
+        <span className="arch-node">Backend</span>
+        <span className="arch-arrow">→</span>
+        <span className="arch-node arch-node-accent">LiteLLM<small>unified API gateway</small></span>
+        <span className="arch-arrow">→</span>
+        <span className="arch-node">Claude Sonnet<small>content generation</small></span>
+      </div>
+      <div className="landing-hint" style={{ marginTop: 10 }}>
+        model-agnostic by design — the model can be swapped or extended without touching backend logic
+      </div>
+
+      <div className="landing-hint" style={{ marginTop: 30 }}>Click a layer to explore · All data shown is synthetic demo data</div>
+    </div>
+  )
+}
+
+return Landing;
+})();
+
+const SecurityPulse = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+const CONTEXTS = [
+  { icon: '📈', title: 'Overall Proficiency', desc: 'Aggregated usage telemetry across all skill vectors.' },
+  { icon: '✍️', title: 'Prompt Engineering', desc: 'Structured prompting, context setting, iteration habits.' },
+  { icon: '🤖', title: 'Agentic Workflows', desc: 'Delegating multi-step tasks to agents with review loops.' },
+  { icon: '🗂️', title: 'Data Judgment', desc: 'Knowing which data can go into which tool; approved workspaces.' },
+  { icon: '⚡', title: 'Shadow AI', desc: 'Unsanctioned tool usage — an enablement opportunity, not just a risk.' },
+]
+
+const QUADRANTS = [
+  { dot: '#17a673', name: 'Champions (High Mot, High Skill)', desc: 'AI power users. Give them frontier tools and let them evangelize.' },
+  { dot: '#d99a06', name: 'Rising (High Mot, Low Skill)', desc: 'Eager and motivated — just need the right templates and hands-on support to convert fast.' },
+  { dot: '#e2762d', name: 'Untapped (Low Mot, High Skill)', desc: 'Already capable. A peer win or a clear ROI story usually flips this group quickly.' },
+  { dot: '#4d7ee0', name: 'Getting Started (Low Mot, Low Skill)', desc: 'Earliest in the journey. Small wins and guided first steps close this gap fast.' },
+]
+
+// scatter points: [skill, motivation, quadrant color, team]
+const POINTS = [
+  [78, 88, '#17a673', 'Engineering'], [84, 81, '#17a673', 'TDI'], [68, 74, '#17a673', 'Marketing'],
+  [30, 79, '#d99a06', 'Finance'], [24, 68, '#d99a06', 'HR'], [38, 84, '#d99a06', 'Sales'],
+  [76, 30, '#e2762d', 'Security'], [82, 22, '#e2762d', 'Legal'],
+  [26, 24, '#4d7ee0', 'Field Ops'], [34, 18, '#4d7ee0', 'Contractors'],
+]
+
+const VECTORS = ['Prompting', 'Agent Use', 'Data Judgment', 'Automation']
+
+const MATRIX = {
+  Team: [
+    ['Engineering', 78, [82, 74, 79, 76]],
+    ['TDI', 74, [79, 71, 75, 72]],
+    ['Marketing', 66, [74, 58, 62, 68]],
+    ['Finance', 48, [55, 38, 61, 39]],
+    ['Sales', 44, [52, 33, 48, 41]],
+    ['HR', 42, [49, 31, 56, 33]],
+    ['Legal', 35, [41, 22, 58, 20]],
+  ],
+  Location: [
+    ['US', 61, [67, 54, 63, 58]],
+    ['India', 63, [68, 58, 62, 63]],
+    ['Canada', 58, [64, 51, 61, 55]],
+    ['Australia', 56, [62, 49, 59, 53]],
+    ['Romania', 59, [64, 53, 60, 58]],
+    ['UK', 60, [66, 52, 63, 57]],
+    ['Ireland', 57, [63, 50, 60, 54]],
+    ['Philippines', 55, [61, 48, 58, 52]],
+    ['Spain', 54, [60, 46, 58, 51]],
+    ['Japan', 49, [56, 40, 55, 44]],
+  ],
+  Seniority: [
+    ['Executive', 44, [52, 33, 56, 34]],
+    ['Director', 52, [59, 44, 58, 46]],
+    ['Manager', 57, [63, 50, 60, 54]],
+    ['IC — Senior', 66, [71, 61, 65, 66]],
+    ['IC — Junior', 71, [77, 66, 63, 74]],
+    ['Contractor', 41, [48, 31, 49, 35]],
+  ],
+}
+
+// proficiency: higher is better
+function heatColor(v) {
+  if (v >= 75) return { background: '#dff3e9', color: '#0d5c40' }
+  if (v >= 60) return { background: '#e9f2d4', color: '#4a5c0d' }
+  if (v >= 45) return { background: '#fbe9c2', color: '#7a5205' }
+  if (v >= 30) return { background: '#f9d7c0', color: '#7d3a10' }
+  return { background: '#f6c3c8', color: '#7c1e26' }
+}
+
+function Scatter() {
+  const W = 520, H = 360, PAD = 44
+  const x = (v) => PAD + (v / 100) * (W - PAD - 16)
+  const y = (v) => H - PAD - (v / 100) * (H - PAD - 16)
+  return (
+    <svg viewBox={`0 0 ${W} ${H}`} style={{ width: '100%' }}>
+      {/* quadrant tints */}
+      <rect x={x(0)} y={y(100)} width={(x(50) - x(0))} height={y(50) - y(100)} fill="#d99a06" opacity="0.07" />
+      <rect x={x(50)} y={y(100)} width={(x(100) - x(50))} height={y(50) - y(100)} fill="#17a673" opacity="0.07" />
+      <rect x={x(0)} y={y(50)} width={(x(50) - x(0))} height={y(0) - y(50)} fill="#4d7ee0" opacity="0.07" />
+      <rect x={x(50)} y={y(50)} width={(x(100) - x(50))} height={y(0) - y(50)} fill="#e2762d" opacity="0.07" />
+      <text x={x(25)} y={y(76)} textAnchor="middle" fontSize="15" fontWeight="800" fill="#d99a06" opacity="0.4">RISING</text>
+      <text x={x(75)} y={y(76)} textAnchor="middle" fontSize="15" fontWeight="800" fill="#17a673" opacity="0.4">CHAMPIONS</text>
+      <text x={x(25)} y={y(24)} textAnchor="middle" fontSize="14" fontWeight="800" fill="#4d7ee0" opacity="0.45">GETTING STARTED</text>
+      <text x={x(75)} y={y(24)} textAnchor="middle" fontSize="15" fontWeight="800" fill="#e2762d" opacity="0.4">UNTAPPED</text>
+      {/* axes */}
+      <line x1={x(0)} y1={y(0)} x2={x(100)} y2={y(0)} stroke="#c8cde0" />
+      <line x1={x(0)} y1={y(0)} x2={x(0)} y2={y(100)} stroke="#c8cde0" />
+      {[0, 25, 50, 75, 100].map((t) => (
+        <g key={t}>
+          <text x={x(t)} y={H - PAD + 16} textAnchor="middle" fontSize="9" fill="#5a6178">{t}</text>
+          <text x={PAD - 8} y={y(t) + 3} textAnchor="end" fontSize="9" fill="#5a6178">{t}</text>
+        </g>
+      ))}
+      {/* diagonal frontier */}
+      <line x1={x(2)} y1={y(98)} x2={x(98)} y2={y(2)} stroke="#5a6178" strokeDasharray="5 4" opacity="0.5" />
+      {/* points */}
+      {POINTS.map(([a, m, c, team], i) => (
+        <g key={i}>
+          <circle cx={x(a)} cy={y(m)} r="6" fill={c} opacity="0.9">
+            <title>{team} — skill {a}, motivation {m}</title>
+          </circle>
+        </g>
+      ))}
+      <text x={W / 2} y={H - 8} textAnchor="middle" fontSize="10" fill="#5a6178">Skill (Tools, Training, Fluency) →</text>
+      <text x={13} y={H / 2} textAnchor="middle" fontSize="10" fill="#5a6178" transform={`rotate(-90 13 ${H / 2})`}>Motivation (Curiosity, Buy-in) →</text>
+    </svg>
+  )
+}
+
+function SecurityPulse() {
+  const [context, setContext] = useState(0)
+  const [tab, setTab] = useState('map')
+  const [axis, setAxis] = useState('Team')
+  const [popTab, setPopTab] = useState('Team')
+
+  return (
+    <div className="light-shell">
+      <aside className="sidebar">
+        <div className="sidebar-title">
+          <div className="sidebar-logo">AP</div>
+          <h2>AI Pulse</h2>
+        </div>
+        <div className="sidebar-sub">AI Proficiency Dashboard</div>
+        <div className="sidebar-section">VIEWS</div>
+        <button className={`sidebar-item ${tab === 'map' ? 'active' : ''}`} onClick={() => setTab('map')}>Adoption Mapping</button>
+        <button className={`sidebar-item ${tab === 'matrix' ? 'active' : ''}`} onClick={() => setTab('matrix')}>Proficiency Matrix</button>
+        <div className="sidebar-footer">
+          <div className="sidebar-section">PLATFORMS</div>
+          <a>› Ampliverse</a>
+          <a>› Scenario Orchestrator</a>
+          <a>› Amplify</a>
+        </div>
+      </aside>
+
+      <div className="content">
+        <div className="sidebar-section" style={{ marginTop: 0 }}>▼ DASHBOARD SKILL CONTEXT</div>
+        <div className="context-row">
+          {CONTEXTS.map((c, i) => (
+            <button key={c.title} className={`context-card ${context === i ? 'selected' : ''}`} onClick={() => setContext(i)}>
+              <span className="cc-icon">{c.icon}</span>
+              <h4>{c.title}</h4>
+              <p>{c.desc}</p>
+            </button>
+          ))}
+        </div>
+
+        <div className="tab-row">
+          <button className={tab === 'map' ? 'active' : ''} onClick={() => setTab('map')}>Adoption Mapping</button>
+          <button className={tab === 'matrix' ? 'active' : ''} onClick={() => setTab('matrix')}>Proficiency Matrix</button>
+        </div>
+
+        {tab === 'map' && (
+          <div className="pulse-grid">
+            <div className="card">
+              <div className="scatter-head">
+                <h3>📊 Adoption Drivers Assessment</h3>
+                <div className="seg">
+                  {['Team', 'Location', 'Seniority'].map((t) => (
+                    <button key={t} className={popTab === t ? 'active' : ''} onClick={() => setPopTab(t)}>{t}</button>
+                  ))}
+                </div>
+              </div>
+              <div className="scatter-sub">Mapping populations to understand why AI adoption stalls — or takes off.</div>
+              <Scatter />
+            </div>
+            <div>
+              <div className="card">
+                <h3 style={{ fontSize: 13, marginBottom: 14 }}>Adoption Quadrants</h3>
+                <div className="quad-legend">
+                  {QUADRANTS.map((q) => (
+                    <div className="quad-item" key={q.name}>
+                      <span className="quad-dot" style={{ background: q.dot }} />
+                      <span><b>{q.name}</b><br />{q.desc}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="analyst-note">
+                  <h5>⚡ ANALYST INTERPRETATION ({popTab.toUpperCase()})</h5>
+                  Analyzing adoption by {popTab} highlights structural enablement gaps. A cluster in the
+                  'Rising' quadrant usually means a team is motivated but lacks workflow-specific templates and
+                  training — not a motivation problem, a support problem.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {tab === 'matrix' && (
+          <div className="card">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <h3 style={{ fontSize: 14.5 }}>📍 Dynamic Proficiency Matrix</h3>
+                <div className="scatter-sub">Cross-reference AI proficiency scores (0–100, higher is better) across dimensions.</div>
+              </div>
+              <div className="matrix-controls">
+                <label>Y-AXIS</label>
+                <select value={axis} onChange={(e) => setAxis(e.target.value)}>
+                  {Object.keys(MATRIX).map((k) => <option key={k}>{k}</option>)}
+                </select>
+                <label>X-AXIS</label>
+                <select defaultValue="Skill Vector"><option>Skill Vector</option></select>
+              </div>
+            </div>
+            <table className="matrix">
+              <thead>
+                <tr>
+                  <th className="rowhead">{axis} vs Skill Vector</th>
+                  {VECTORS.map((v) => <th key={v}>{v}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {MATRIX[axis].map(([name, avg, vals]) => (
+                  <tr key={name}>
+                    <td className="rowlabel">{name}<span>Avg {avg}</span></td>
+                    {vals.map((v, i) => (
+                      <td key={i}><span className="heat" style={heatColor(v)}>{v}</span></td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+return SecurityPulse;
+})();
+
+const AdminCatalog = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+const MODULES = [
+  { title: 'Tap Card Learning', slug: 'tap-card', status: 'Draft', kind: 'lesson', coll: 'Skill Builders', updated: 'Jun 22, 2026', desc: 'Bite-sized AI-capability cards. Tap through a stacked deck to pick up a new skill in under two minutes.' },
+  { title: 'Prompt Lab — Live Simulation', slug: 'prompt-lab-dynamic', status: 'Draft', kind: 'tool', coll: 'Prompt Lab', updated: 'Jun 22, 2026', desc: 'AI-generated workflow simulation. Each scenario targets a specific leverage moment.' },
+  { title: 'Automate Your Monday', slug: 'automate-monday', status: 'Published', kind: 'lesson', coll: 'Skill Builders', updated: 'Jun 22, 2026', desc: 'Hand your recurring Monday chores to an agent — inbox triage, status drafts, meeting prep.' },
+  { title: 'Prompt Patterns 101', slug: 'prompt-patterns', status: 'Published', kind: 'lesson', coll: 'Skill Builders', updated: 'Jun 17, 2026', desc: 'Role, context, format, examples: the four patterns behind reliable outputs.' },
+  { title: 'Meeting Notes in Minutes', slug: 'meeting-notes', status: 'Published', kind: 'lesson', coll: 'Skill Builders', updated: 'Jun 15, 2026', desc: 'From raw transcript to decisions-and-actions summary — with a reusable template.' },
+  { title: 'Shadow AI: The Incident', slug: 'shadow-ai-incident', status: 'Published', kind: 'lesson', coll: 'Skill Builders', updated: 'Jun 14, 2026', desc: 'Interactive story following a well-meaning employee who pastes source code into a public chatbot — builds judgment, not just avoidance.' },
+  { title: 'AI Fluency in 15 Minutes', slug: 'ai-fluency-15', status: 'Published', kind: 'lesson', coll: 'Skill Builders', updated: 'Jun 23, 2026', desc: 'A fast primer on where AI actually saves you time this week — no jargon, just the moves that matter.' },
+  { title: 'Context Engineering Basics', slug: 'context-engineering', status: 'Published', kind: 'lesson', coll: 'Skill Builders', updated: 'Jun 24, 2026', desc: 'Give AI the right background and it gives you the right answer. The three things every good prompt needs.' },
+  { title: 'Chaining Prompts: Multi-Step Workflows', slug: 'chaining-prompts', status: 'Published', kind: 'lesson', coll: 'Skill Builders', updated: 'Jun 25, 2026', desc: 'Turn one question into a pipeline — draft, critique, refine — without ever leaving the chat.' },
+  { title: 'From Idea to Draft in Five Minutes', slug: 'idea-to-draft', status: 'Published', kind: 'lesson', coll: 'Skill Builders', updated: 'Jun 26, 2026', desc: 'Brainstorm, structure, and write a first draft with AI as your thinking partner, not your ghostwriter.' },
+  { title: 'AI-Assisted Slide Design', slug: 'slide-design', status: 'Published', kind: 'lesson', coll: 'Skill Builders', updated: 'Jun 27, 2026', desc: 'Stop rebuilding formatting by hand — apply the firm\'s template and brand style automatically, then review.' },
+  { title: 'Reading a Spreadsheet Out Loud', slug: 'spreadsheet-insights', status: 'Published', kind: 'lesson', coll: 'Skill Builders', updated: 'Jun 28, 2026', desc: 'Paste in a dataset and get a plain-English summary, three questions worth asking, and one chart worth building.' },
+  { title: 'Which AI Tool for Which Task', slug: 'right-tool', status: 'Published', kind: 'lesson', coll: 'Skill Builders', updated: 'Jun 29, 2026', desc: 'Claude, Copilot, or Gemini? A side-by-side matrix mapping tools to task types — writing, coding, analysis, meetings — so you stop defaulting to whichever one is already open.' },
+  { title: 'Delegating a Research Brief', slug: 'research-brief', status: 'Draft', kind: 'tool', coll: 'Skill Builders', updated: 'Jun 30, 2026', desc: 'Hand a research question to an agent, review its sources, and know when to trust the summary.' },
+  { title: 'Tokens, Context & Cost: The Basics', slug: 'tokens-context-cost', status: 'Published', kind: 'lesson', coll: 'Skill Builders', updated: 'Jul 1, 2026', desc: 'What a token actually is, why context windows have limits, and how usage translates to cost — so you can work with the model instead of against it.' },
+  { title: 'Picking Fast vs. Frontier Models', slug: 'model-selection', status: 'Published', kind: 'lesson', coll: 'Skill Builders', updated: 'Jul 2, 2026', desc: 'Not every task needs the biggest model. When a fast, cheap model beats a frontier one — and when it doesn’t.' },
+  { title: 'Prompt Lab', slug: 'prompt-lab', status: 'Published', kind: 'tool', coll: 'Simulations', updated: 'Jun 22, 2026', desc: 'Inbox simulator — spot AI leverage moments across email, Teams, and docs.' },
+  { title: 'Agent Harbor', slug: 'agent-harbor', status: 'Published', kind: 'simulation', coll: 'Simulations', updated: 'Jun 11, 2026', desc: 'Agent-delegation tabletop — practice handing off multi-step work and judging which tools are actually worth adopting.' },
+]
+
+const COLLECTIONS = [
+  { order: 1, name: 'Prompt Lab', slug: 'prompt-lab', modules: 1 },
+  { order: 3, name: 'Agent Harbor', slug: 'agent-harbor', modules: 1 },
+  { order: 5, name: 'Simulations', slug: 'simulations', modules: 2 },
+  { order: 6, name: 'Skill Builders', slug: 'skill-builders', modules: 15 },
+]
+
+function AdminCatalog({ onNavigate }) {
+  const [view, setView] = useState('modules')
+  const [statusFilter, setStatusFilter] = useState('All')
+  const [collFilter, setCollFilter] = useState('All collections')
+
+  const shown = MODULES.filter(
+    (m) =>
+      (statusFilter === 'All' || m.status === statusFilter) &&
+      (collFilter === 'All collections' || m.coll === collFilter),
+  )
+
+  return (
+    <div className="light-shell">
+      <aside className="sidebar">
+        <div className="sidebar-title">
+          <div className="sidebar-logo">AM</div>
+          <h2>Amplify</h2>
+        </div>
+        <div className="sidebar-sub">Platform · Admin</div>
+        <div className="sidebar-section">CONTENT</div>
+        <button className={`sidebar-item ${view === 'modules' ? 'active' : ''}`} onClick={() => setView('modules')}>▦ Modules</button>
+        <button className={`sidebar-item ${view === 'collections' ? 'active' : ''}`} onClick={() => setView('collections')}>🗂 Collections</button>
+        <button className="sidebar-item">＋ Create / Import</button>
+        <div className="sidebar-section">PEOPLE</div>
+        <button className="sidebar-item">👥 Users</button>
+        <div className="sidebar-section">SYSTEM</div>
+        <button className="sidebar-item">⚙ Settings</button>
+        <button className="sidebar-item">ⓘ About</button>
+        <div className="sidebar-footer"><a onClick={() => onNavigate('ampliverse')}>👁 View catalog</a></div>
+      </aside>
+
+      <div className="content">
+        {view === 'modules' && (
+          <>
+            <div className="catalog-head">
+              <h1>Modules <span style={{ fontSize: 13, color: 'var(--ink-soft)', fontWeight: 400 }}>({shown.length} shown)</span></h1>
+              <button className="btn btn-primary">＋ Create or import</button>
+            </div>
+            <div className="filter-row">
+              {['All', 'Published', 'Unlisted', 'Draft'].map((f) => (
+                <button key={f} className={`filter-pill ${statusFilter === f ? 'active' : ''}`} onClick={() => setStatusFilter(f)}>{f}</button>
+              ))}
+              <span className="filter-gap" />
+              {['All collections', 'Prompt Lab', 'Agent Harbor', 'Simulations', 'Skill Builders'].map((f) => (
+                <button key={f} className={`filter-pill ${collFilter === f ? 'active' : ''}`} onClick={() => setCollFilter(f)}>{f}</button>
+              ))}
+            </div>
+            {shown.map((m) => (
+              <div className="module-row" key={m.slug}>
+                <div className="module-info">
+                  <h4>
+                    {m.title}
+                    <span className={`chip ${m.status === 'Published' ? 'chip-green' : m.status === 'Draft' ? 'chip-amber' : 'chip-grey'}`}>{m.status}</span>
+                    <span className="chip chip-grey">{m.kind}</span>
+                  </h4>
+                  <div className="module-meta"><code>{m.slug}</code> {m.coll} · Updated {m.updated}</div>
+                  <div className="module-desc">{m.desc}</div>
+                </div>
+                <div className="module-actions">
+                  <button className="btn btn-sm btn-danger-ghost">Delete</button>
+                  <button className="btn btn-sm">Edit</button>
+                  <button className="btn btn-sm">Results</button>
+                  <button className="btn btn-sm btn-primary" onClick={() => m.slug.startsWith('prompt-lab') ? onNavigate('cipher') : onNavigate('ampliverse')}>Launch →</button>
+                </div>
+              </div>
+            ))}
+          </>
+        )}
+
+        {view === 'collections' && (
+          <>
+            <h1>Collections</h1>
+            <p className="content-sub">
+              Collections group modules together and appear as filters on the home page. They are shown in
+              order_index order — the first one is selected by default.
+            </p>
+            <div className="card" style={{ marginBottom: 16, display: 'flex', gap: 10, alignItems: 'flex-end' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 6 }}>New collection name</label>
+                <input type="text" placeholder="e.g. Simulations" style={{ width: '100%', font: 'inherit', fontSize: 13, padding: '9px 12px', borderRadius: 8, border: '1px solid var(--line)' }} />
+              </div>
+              <div>
+                <label style={{ fontSize: 12, fontWeight: 600, display: 'block', marginBottom: 6 }}>Order</label>
+                <input type="text" defaultValue="4" style={{ width: 70, font: 'inherit', fontSize: 13, padding: '9px 12px', borderRadius: 8, border: '1px solid var(--line)' }} />
+              </div>
+              <button className="btn btn-primary">＋ Add</button>
+            </div>
+            <div className="card" style={{ padding: 0 }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
+                <thead>
+                  <tr style={{ textAlign: 'left', color: 'var(--ink-soft)', fontSize: 10.5, letterSpacing: 1 }}>
+                    {['ORDER', 'NAME', 'SLUG', 'MODULES', 'ACTIONS'].map((col) => (
+                      <th key={col} style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)' }}>{col}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {COLLECTIONS.map((c) => (
+                    <tr key={c.slug}>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)' }}>{c.order} <button className="btn btn-sm" style={{ marginLeft: 8 }}>Set</button></td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)', fontWeight: 600 }}>{c.name}</td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)' }}><code style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, background: '#eef0f6', padding: '2px 7px', borderRadius: 5 }}>{c.slug}</code></td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)' }}>{c.modules}</td>
+                      <td style={{ padding: '12px 16px', borderBottom: '1px solid var(--line)' }}><button className="btn btn-sm btn-danger-ghost">Delete</button></td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}
+
+return AdminCatalog;
+})();
+
+const Orchestrator = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+const SKILL_TYPES = ['All', 'Prompting', 'Agents', 'Data', 'Automation']
+const POP_MODES = ['✦ AI Selected', '👥 By Persona', '🏢 By Group', '✕ Intersections']
+
+function Orchestrator({ onNavigate, campaign, setCampaign }) {
+  const [brief, setBrief] = useState('https://ai-blog.example.com/announcements/introducing-computer-use-agents-for-the-enterprise/')
+  const [skillType, setSkillType] = useState('All')
+  const [popMode, setPopMode] = useState('✦ AI Selected')
+  const [formats, setFormats] = useState({ sim: true, teams: true })
+  const [generating, setGenerating] = useState(false)
+  const [resultTab, setResultTab] = useState('Results')
+
+  const generate = () => {
+    setGenerating(true)
+    setTimeout(() => {
+      setCampaign({
+        title: 'Agentic Workflow Fundamentals',
+        source: brief,
+        emailPreview:
+          'Your quarterly board summary is due at 5pm. The source doc is 40 pages and marked Internal-Confidential. How do you get it done…',
+        simUrl: 'https://enablement-platform.example.com/modules/prompt-lab-dynamic?scenario_id=4d5a6be1-98a7-4a09-ad13-d6f1e5aeccf0',
+        teamsMessage:
+          '🚀 New AI skills scenario live: Agentic Workflows. Test your delegation skills at',
+        inferred: ['Inferred: Agents', 'Inferred: Data Judgment'],
+        recommended: ['⭐ Recommended', '🏆 Champions', '🔧 Frustrated', '🤨 Skeptical', '💤 Disengaged'],
+      })
+      setGenerating(false)
+    }, 1600)
+  }
+
+  return (
+    <div className="light-shell">
+      <aside className="sidebar">
+        <div className="sidebar-title">
+          <div className="sidebar-logo">⚡</div>
+          <h2>Orchestrator</h2>
+        </div>
+        <div className="sidebar-sub">AI Enablement</div>
+        <div className="sidebar-section">TOOLS</div>
+        <button className="sidebar-item active">✦ Generate Campaign</button>
+        <button className="sidebar-item">🕓 History</button>
+        <button className="sidebar-item">⚙ Settings</button>
+        <div className="sidebar-footer">
+          <div className="sidebar-section">PLATFORMS</div>
+          <a onClick={() => onNavigate('ampliverse')}>› Ampliverse</a>
+          <a onClick={() => onNavigate('pulse')}>› AI Pulse</a>
+          <a onClick={() => onNavigate('catalog')}>› Module Catalog</a>
+          <a onClick={() => onNavigate('command')}>› Amplify</a>
+        </div>
+      </aside>
+
+      <div className="content" style={{ maxWidth: 1250 }}>
+        <div className="orch-grid">
+          <div>
+            <h1>Generate Enablement Campaign</h1>
+            <p className="content-sub">Paste a capability brief. AI builds the training.</p>
+
+            <div className="card orch-step">
+              <h4>1 — CAPABILITY BRIEF</h4>
+              <textarea value={brief} onChange={(e) => setBrief(e.target.value)} />
+              <div style={{ marginTop: 12 }}>
+                <h4 style={{ marginBottom: 8 }}>SKILL FOCUS</h4>
+                <div className="pill-row">
+                  {SKILL_TYPES.map((r) => (
+                    <button key={r} className={`filter-pill small ${skillType === r ? 'active' : ''}`} onClick={() => setSkillType(r)}>{r}</button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <div className="card orch-step">
+              <h4>2 — TARGET POPULATIONS</h4>
+              <div className="pill-row" style={{ marginBottom: 12 }}>
+                {POP_MODES.map((p) => (
+                  <button key={p} className={`filter-pill small ${popMode === p ? 'active' : ''}`} onClick={() => setPopMode(p)}>{p}</button>
+                ))}
+              </div>
+              {campaign ? (
+                <div className="inferred-tags">
+                  {campaign.inferred.map((t) => <span key={t} className="chip chip-purple">{t}</span>)}
+                  {campaign.recommended.map((t) => <span key={t} className="chip chip-grey">{t}</span>)}
+                </div>
+              ) : (
+                <p style={{ fontSize: 11.5, color: 'var(--ink-soft)' }}>
+                  Type a brief or select a skill focus above.<br />
+                  <em>No low-proficiency intersections found. Try a different skill focus or add a capability brief.</em>
+                </p>
+              )}
+              <button className="btn btn-sm" style={{ marginTop: 10 }} onClick={() => onNavigate('pulse')}>🔍 Explore in AI Pulse</button>
+            </div>
+
+            <div className="card orch-step">
+              <h4>3 — ENGAGEMENT FORMATS</h4>
+              <label className={`format-opt ${formats.sim ? 'checked' : ''}`}>
+                <input type="checkbox" checked={formats.sim} onChange={() => setFormats({ ...formats, sim: !formats.sim })} />
+                <div>
+                  <h5>🎯 Workflow Simulator</h5>
+                  <p>Realistic prompt-lab scenario. Recipients get a shareable link.</p>
+                </div>
+              </label>
+              <label className={`format-opt ${formats.teams ? 'checked' : ''}`}>
+                <input type="checkbox" checked={formats.teams} onChange={() => setFormats({ ...formats, teams: !formats.teams })} />
+                <div>
+                  <h5>💬 Amplify Teams Blast</h5>
+                  <p>Announcement message drafted for the Amplify Teams bot.</p>
+                </div>
+              </label>
+              <button className="btn btn-primary big-cta" onClick={generate} disabled={generating}>
+                {generating ? (<><span className="spin" />Synthesizing campaign…</>) : '✦ Generate'}
+              </button>
+            </div>
+          </div>
+
+          <div>
+            <div className="tab-row">
+              {['Results', 'History', 'Settings'].map((t) => (
+                <button key={t} className={resultTab === t ? 'active' : ''} onClick={() => setResultTab(t)}>{t}</button>
+              ))}
+            </div>
+
+            {resultTab === 'Results' && !campaign && (
+              <div className="card">
+                <div className="empty-state">
+                  <div className="es-icon">📄</div>
+                  No campaign generated yet<br />
+                  <span style={{ fontSize: 11.5 }}>Fill in a capability brief and click Generate.</span>
+                </div>
+              </div>
+            )}
+
+            {resultTab === 'Results' && campaign && (
+              <>
+                <div className="card gen-result">
+                  <div className="gen-result-head">
+                    <h4><span className="status-dot" /> WORKFLOW SIMULATOR</h4>
+                    <span className="chip chip-grey">Email – Prompt Lab</span>
+                  </div>
+                  <b style={{ fontSize: 13.5 }}>{campaign.title}</b>
+                  <div className="gen-quote">{campaign.emailPreview}</div>
+                  <div className="gen-url">
+                    <code>{campaign.simUrl}</code>
+                    <button className="btn btn-sm">Copy</button>
+                  </div>
+                  <button className="btn btn-primary big-cta" onClick={() => onNavigate('cipher')}>Open Simulation</button>
+                </div>
+
+                <div className="card gen-result">
+                  <div className="gen-result-head">
+                    <h4><span className="status-dot" /> AMPLIFY TEAMS BLAST</h4>
+                    <span className="chip chip-grey">Teams Chat Campaign</span>
+                  </div>
+                  <div style={{ fontSize: 10.5, letterSpacing: 1, color: 'var(--ink-soft)', marginBottom: 8 }}>GENERATED MESSAGE</div>
+                  <div className="gen-quote" style={{ fontStyle: 'normal' }}>
+                    {campaign.teamsMessage} {campaign.simUrl}
+                  </div>
+                  <button className="btn btn-primary big-cta" onClick={() => onNavigate('command')}>Open in Amplify</button>
+                  <button className="btn big-cta">Copy Message</button>
+                </div>
+                <div style={{ textAlign: 'center' }}>
+                  <button className="btn btn-sm" onClick={() => setCampaign(null)}>Generate another scenario</button>
+                </div>
+              </>
+            )}
+
+            {resultTab !== 'Results' && (
+              <div className="card"><div className="empty-state">Nothing here yet in this demo.</div></div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+return Orchestrator;
+})();
+
+const CommandCentre = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+const STEPS = ['Details', 'Audience', 'Message', 'Review & Send']
+
+function CommandCentre({ onNavigate, campaign }) {
+  const [step, setStep] = useState(1)
+  const [sent, setSent] = useState(false)
+  const [audMode, setAudMode] = useState('Manual Entry')
+  const [email, setEmail] = useState('caroline.vonkonigsmark@example.com')
+
+  const title = campaign?.title || 'Agentic Workflow Fundamentals'
+
+  if (sent) {
+    return (
+      <div className="light-shell">
+        <Sidebar onNavigate={onNavigate} />
+        <div className="content">
+          <a style={{ fontSize: 12, color: 'var(--ink-soft)', cursor: 'pointer' }} onClick={() => setSent(false)}>← Back to Campaigns</a>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', margin: '10px 0 22px' }}>
+            <h1>Training: {title} <span className="chip chip-green" style={{ verticalAlign: 'middle', marginLeft: 8 }}>Completed</span></h1>
+            <div style={{ display: 'flex', gap: 8 }}>
+              <button className="btn btn-sm">Export CSV</button>
+              <button className="btn btn-sm">Export JSON</button>
+              <button className="btn btn-sm">⧉ Duplicate</button>
+            </div>
+          </div>
+
+          <div className="tab-row">
+            {['Overview', 'Audience', 'Message', 'Responses', 'Audit', 'Simulate'].map((t, i) => (
+              <button key={t} className={i === 0 ? 'active' : ''}>{t}</button>
+            ))}
+          </div>
+
+          <div className="stats-row">
+            <div className="stat-card"><div className="num">1</div><div className="lbl">AUDIENCE</div></div>
+            <div className="stat-card"><div className="num green">1</div><div className="lbl">DELIVERED</div></div>
+            <div className="stat-card"><div className="num">0</div><div className="lbl">RESPONSES</div></div>
+            <div className="stat-card"><div className="num">100%</div><div className="lbl">DELIVERY RATE</div></div>
+            <div className="stat-card"><div className="num">0%</div><div className="lbl">RESPONSE RATE</div></div>
+          </div>
+
+          <div className="card" style={{ marginBottom: 16 }}>
+            <h3 style={{ fontSize: 13.5, marginBottom: 14 }}>Delivery Status</h3>
+            <div className="donut-wrap">
+              <svg width="130" height="130" viewBox="0 0 130 130">
+                <circle cx="65" cy="65" r="52" fill="none" stroke="#eef0f6" strokeWidth="16" />
+                <circle cx="65" cy="65" r="52" fill="none" stroke="#17a673" strokeWidth="16"
+                  strokeDasharray="82 245" strokeLinecap="round" transform="rotate(-90 65 65)" />
+              </svg>
+              <div style={{ fontSize: 12.5, color: 'var(--ink-soft)' }}>
+                <span className="chip chip-green">● Delivered — 1</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
+            <h3 style={{ fontSize: 13.5, marginBottom: 14 }}>Campaign Info</h3>
+            <div className="campaign-info-grid">
+              <div>Created by: <b>caroline.vonkonigsmark@example.com</b></div>
+              <div>Created: <b>22/06/2026, 5:36:34 pm</b></div>
+              <div>Sent: <b>22/06/2026, 5:38:03 pm</b></div>
+              <div>Completed: <b>22/06/2026, 5:38:04 pm</b></div>
+              <div>Quiz: <b>No</b></div>
+              <div>Channel: <b>Teams Chat (Amplify bot)</b></div>
+            </div>
+          </div>
+          <div style={{ marginTop: 18 }}>
+            <button className="btn btn-primary" onClick={() => onNavigate('teams')}>View delivery in Teams →</button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="light-shell">
+      <Sidebar onNavigate={onNavigate} />
+      <div className="content" style={{ maxWidth: 860 }}>
+        <a style={{ fontSize: 12, color: 'var(--ink-soft)', cursor: 'pointer' }}>← Back to Campaigns</a>
+        <h1 style={{ margin: '10px 0 22px' }}>New Campaign</h1>
+
+        <div className="wizard-steps">
+          {STEPS.map((s, i) => (
+            <div key={s} className={`wstep ${i < step ? 'done' : i === step ? 'current' : ''}`}>
+              {i < step ? '✓ ' : ''}{s}
+            </div>
+          ))}
+        </div>
+
+        {step === 1 && (
+          <div className="card">
+            <h3 style={{ fontSize: 16, marginBottom: 18 }}>Select Audience</h3>
+            <div className="audience-tabs">
+              {['Manual Entry', 'CSV Upload', 'Teams Channel', 'OoO / Group'].map((m) => (
+                <button key={m} className={`btn btn-sm ${audMode === m ? 'btn-primary' : ''}`} onClick={() => setAudMode(m)}>{m}</button>
+              ))}
+            </div>
+            <div className="field">
+              <label>Email Addresses</label>
+              <div className="hint">Type or paste emails. Press Enter or comma to add.</div>
+              <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+            </div>
+            <div className="wizard-nav">
+              <button className="btn" onClick={() => setStep(1)}>← Back</button>
+              <button className="btn btn-primary" onClick={() => setStep(2)}>Next →</button>
+            </div>
+          </div>
+        )}
+
+        {step === 2 && (
+          <div className="card">
+            <h3 style={{ fontSize: 16, marginBottom: 6 }}>Compose Message</h3>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginBottom: 14 }}>
+              <span className="chip chip-grey">Quiz Mode ☐</span>
+              <span className="chip chip-purple">WYSIWYG</span>
+              <span className="chip chip-grey">Raw Markdown</span>
+              <span style={{ flex: 1 }} />
+              <button className="btn btn-sm">Preview</button>
+            </div>
+            <div className="compose-toolbar">
+              {['B', 'I', 'S', '</>', '🔗', '{ }', '•', '😀'].map((t) => <span key={t}>{t}</span>)}
+              <span style={{ flex: 1 }} />
+              <span style={{ color: 'var(--accent)' }}>✦ Refine</span>
+            </div>
+            <div className="compose-body">
+              🚀 <b>Think you could hand half your Monday to an AI agent?</b>
+              <p style={{ marginTop: 10 }}>
+                Agentic workflows let you delegate multi-step tasks — research, drafts, meeting prep — while
+                you stay in the review seat.
+              </p>
+              <p style={{ marginTop: 10 }}>Put your delegation skills to the test and find out what you'd hand off first. 👇</p>
+              <div className="compose-img">AGENTIC-WORKFLOWS — CAMPAIGN IMAGE</div>
+            </div>
+            <div style={{ display: 'flex', gap: 7, marginTop: 12 }}>
+              {['+ Text', '+ Buttons', '+ Image', '+ Divider'].map((b) => <button key={b} className="btn btn-sm">{b}</button>)}
+            </div>
+            <div className="field" style={{ marginTop: 20 }}>
+              <label>RESPONSE MESSAGES</label>
+              <div className="hint">Configure the messages users receive after interacting with the campaign.</div>
+              <input type="text" defaultValue="Thanks for your response!" />
+            </div>
+            <div className="wizard-nav">
+              <button className="btn" onClick={() => setStep(1)}>← Back</button>
+              <button className="btn btn-primary" onClick={() => setStep(3)}>Next →</button>
+            </div>
+          </div>
+        )}
+
+        {step === 3 && (
+          <div className="card">
+            <h3 style={{ fontSize: 16, marginBottom: 18 }}>Review &amp; Send</h3>
+            <div className="campaign-info-grid" style={{ marginBottom: 20 }}>
+              <div>Campaign: <b>{title}</b></div>
+              <div>Channel: <b>Teams Chat (Amplify bot)</b></div>
+              <div>Audience: <b>{email}</b></div>
+              <div>Quiz: <b>No</b></div>
+            </div>
+            <div className="wizard-nav">
+              <button className="btn" onClick={() => setStep(2)}>← Back</button>
+              <button className="btn btn-primary" onClick={() => setSent(true)}>🚀 Send Campaign</button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
+function Sidebar({ onNavigate }) {
+  return (
+    <aside className="sidebar">
+      <div className="sidebar-title">
+        <div className="sidebar-logo" style={{ background: 'radial-gradient(circle at 35% 30%, #ff9d5c, #d64550)' }}>🤖</div>
+        <h2>Amplify</h2>
+      </div>
+      <div className="sidebar-sub">Command Centre</div>
+      <div className="sidebar-section">NAVIGATION</div>
+      <button className="sidebar-item active">📣 Campaigns</button>
+      <button className="sidebar-item">💬 Chatbot</button>
+      <button className="sidebar-item">⭐ Quiz &amp; Leaderboards</button>
+      <button className="sidebar-item">ⓘ About</button>
+      <button className="sidebar-item">‹/› Dev Guide</button>
+      <div className="sidebar-footer">
+        <div className="sidebar-section">PLATFORMS</div>
+        <a onClick={() => onNavigate('orchestrator')}>› Scenario Orchestrator</a>
+        <a onClick={() => onNavigate('teams')}>› Teams Delivery</a>
+      </div>
+    </aside>
+  )
+}
+
+return CommandCentre;
+})();
+
+const TeamsMock = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+const CHANNELS = [
+  'ai-exchange', 'ai-edge-weekly', 'amplify-testing', 'ai-champions',
+  'ai-enablement-priv…', 'ai-office-hours', 'ai-apj',
+  'agent-playbooks', 'ai-partners-lea…', 'ai-sessions-res…',
+]
+
+function TeamsMock({ onNavigate, campaign }) {
+  const msg = campaign?.teamsMessage ||
+    '🚀 New AI skills scenario live: Agentic Workflows. Test your delegation skills at'
+
+  return (
+    <div className="teams">
+      <div className="teams-rail">
+        <div className="rail-logo">◍</div>
+        <div className="rail-item"><span className="ri-icon">🔔</span>Activity</div>
+        <div className="rail-item active"><span className="ri-icon">💬</span>Chat</div>
+        <div className="rail-item"><span className="ri-icon">👥</span>Teams</div>
+        <div className="rail-item"><span className="ri-icon">📅</span>Calendar</div>
+        <div className="rail-item"><span className="ri-icon">📁</span>Files</div>
+        <div className="rail-item"><span className="ri-icon">⋯</span>More</div>
+      </div>
+
+      <div className="teams-sidebar">
+        <div className="teams-ws">Chat</div>
+        <div className="teams-section">▾ Pinned</div>
+        <div className="teams-chan active">🤖 Amplify</div>
+        <div className="teams-section">▾ Recent</div>
+        <div className="teams-chan">👤 Priya Ramaswami</div>
+        <div className="teams-chan">👤 Daniel Osei</div>
+        <div className="teams-chan">👤 Freya Lindqvist</div>
+        <div className="teams-section">▾ Teams</div>
+        {CHANNELS.map((c) => (
+          <div className="teams-chan" key={c}># {c}</div>
+        ))}
+      </div>
+
+      <div className="teams-main">
+        <div className="teams-header">
+          <span className="teams-avatar" style={{ width: 26, height: 26, fontSize: 15, borderRadius: '50%' }}>🤖</span>
+          Amplify <span className="teams-app-badge">APP</span>
+          <span style={{ fontWeight: 400, fontSize: 12.5, color: '#8a8886', marginLeft: 8 }}>Chat · Files · Organization</span>
+        </div>
+
+        <div className="teams-msgs">
+          <div className="teams-day"><span>Today</span></div>
+          <div className="teams-msg">
+            <div className="teams-avatar">🤖</div>
+            <div>
+              <div className="teams-msg-head">
+                <b>Amplify</b>
+                <span className="teams-app-badge">APP</span>
+                <span className="teams-time">5:38 PM</span>
+              </div>
+              <div className="teams-bubble">
+                🚀 <b>Think you could hand half your Monday to an AI agent?</b>
+                <br /><br />
+                Agentic workflows let you delegate multi-step tasks — research, drafts, meeting prep —
+                while you stay in the review seat.
+                <br /><br />
+                Put your delegation skills to the test and find out what you'd hand off first. 👇
+                <br /><br />
+                <a onClick={() => onNavigate('cipher')}>Take the simulation now</a>
+                <div style={{ fontSize: 11, color: '#8a8886', marginTop: 8 }}>(351 kB) ▾</div>
+                <div className="teams-img">AGENTIC-WORKFLOWS — CAMPAIGN IMAGE</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="teams-composer">Type a new message</div>
+      </div>
+    </div>
+  )
+}
+
+return TeamsMock;
+})();
+
+const CipherLetter = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+const CHOICES = [
+  { key: 'A', text: 'Paste the full document into your personal free chatbot account', good: false,
+    coach: "Fast, but the document is marked Internal-Confidential — personal free-tier tools may train on or retain your data. This is the moment Shadow AI happens. The approved enterprise workspace does the same job with the right data guarantees." },
+  { key: 'B', text: 'Use the approved enterprise AI workspace with a structured prompt', good: true,
+    coach: "Exactly right. Enterprise workspace + a structured prompt (role, audience, format, length) turns a 3-hour task into a 20-minute review. Bonus: save the prompt as a template so the whole team benefits next quarter." },
+  { key: 'C', text: 'Skip AI and do it manually to be safe', good: false,
+    coach: "Safe, but you just spent 3 hours on a task AI does in minutes — this is a leverage moment missed. 'Safe' and 'AI' aren't opposites: the approved workspace exists precisely so you don't have to choose." },
+]
+
+const FLAGS = [
+  'Tight deadline — a classic AI acceleration moment',
+  'Document is Internal-Confidential — approved tools only',
+  'Task is summarisation, a core LLM strength',
+  'A reusable prompt template exists for board summaries',
+]
+
+function CipherLetter({ onNavigate }) {
+  const [phase, setPhase] = useState('inbox') // inbox → reveal → persona
+  const [picked, setPicked] = useState(null)
+  const [investigated, setInvestigated] = useState(false)
+  const [ticked, setTicked] = useState([])
+
+  const toggleFlag = (f) =>
+    setTicked((t) => (t.includes(f) ? t.filter((x) => x !== f) : [...t, f]))
+
+  return (
+    <div className="sim-shell">
+      <div className="sim-topbar">
+        <h2>
+          <span className="chip chip-purple">✉ Prompt Lab</span>
+          Prompt Lab — Live Simulation
+          <span className="chip chip-amber">Draft preview</span>
+        </h2>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <button className="btn btn-sm" onClick={() => { setPhase('inbox'); setPicked(null); setTicked([]); setInvestigated(false) }}>Reset state</button>
+          <button className="btn btn-sm" onClick={() => onNavigate('catalog')}>← All modules</button>
+        </div>
+      </div>
+
+      {phase !== 'inbox' && (
+        <div className="attack-banner" style={{ background: 'var(--green)' }}>✨ This was an AI leverage moment</div>
+      )}
+
+      {phase === 'persona' ? (
+        <Persona onNavigate={onNavigate} />
+      ) : (
+        <>
+          {phase === 'inbox' && (
+            <div style={{ textAlign: 'center', fontSize: 11.5, color: 'var(--ink-soft)', marginBottom: 12 }}>
+              MESSAGE 1 OF 1
+            </div>
+          )}
+
+          <div style={phase === 'reveal' ? { display: 'grid', gridTemplateColumns: '1fr 320px', gap: 18, alignItems: 'start' } : {}}>
+            <div className="mail-window">
+              <div className="mail-chrome">
+                <span className="mail-logo">M ail</span>
+                <span className="mail-search">🔍 Search mail</span>
+                <span>⚙</span>
+              </div>
+              <div className="mail-body">
+                <div className="mail-nav">
+                  <div className="active"><span>📥 Inbox</span><span>1</span></div>
+                  <div><span>⭐ Starred</span></div>
+                  <div><span>🕓 Snoozed</span></div>
+                  <div><span>📤 Sent</span></div>
+                  <div><span>📝 Drafts</span></div>
+                </div>
+                <div className="mail-content">
+                  <h3>Board summary needed by 5pm today</h3>
+                  <div className="mail-from">
+                    <div className="mail-from-avatar" style={{ background: '#3d5af1' }}>PS</div>
+                    <div>
+                      <b>Priya Sharma — Chief of Staff</b>
+                      <span style={{ fontSize: 11, color: 'var(--ink-soft)' }}>To: me</span>
+                      <span className="mail-from-addr">priya.sharma@meridian.com</span>
+                    </div>
+                    <span className="mail-date">11:42 AM</span>
+                  </div>
+                  <p className="mail-text">
+                    Hi — the board meeting moved up to 5pm today. I need a one-page summary of the Q2 operations
+                    review (the 40-page deck, marked <code>Internal-Confidential</code>): key decisions, risks,
+                    and asks, in the usual board format. Sorry for the crunch — can you get this to me by 4:30?
+                  </p>
+
+                  {phase === 'inbox' &&
+                    CHOICES.map((c) => (
+                      <button
+                        key={c.key}
+                        className={`choice ${picked === c.key ? (c.good ? 'picked-good' : 'picked-bad') : ''}`}
+                        onClick={() => setPicked(c.key)}
+                      >
+                        <span className="key">{c.key}</span>
+                        {c.text}
+                      </button>
+                    ))}
+                </div>
+              </div>
+
+              {phase === 'inbox' && picked && (
+                <div className="coach-box">
+                  <h5>COACHING — OPTION {picked}</h5>
+                  <p>{CHOICES.find((c) => c.key === picked).coach}</p>
+                  <div className="coach-rate">
+                    <button className="btn btn-sm">Not very useful</button>
+                    <button className="btn btn-sm">Helpful</button>
+                  </div>
+                </div>
+              )}
+
+              {phase === 'inbox' && investigated && (
+                <div className="coach-box">
+                  <h5>CHECK THE DATA CLASSIFICATION</h5>
+                  <p>The deck is labelled Internal-Confidential. Policy allows it in the enterprise AI workspace (SSO, zero-retention) — but never in personal free-tier tools.</p>
+                </div>
+              )}
+
+              {phase === 'inbox' && (
+                <div className="sim-actions">
+                  <button className="btn" onClick={() => setInvestigated(true)}>
+                    🔍 Investigate <span className="chip chip-amber" style={{ marginLeft: 6 }}>{investigated ? '1 left' : '2 left'}</span>
+                  </button>
+                  <button className="btn btn-primary" onClick={() => setPhase('reveal')}>
+                    ✨ Submit my approach
+                  </button>
+                  <button className="btn">⏭ Skip</button>
+                </div>
+              )}
+            </div>
+
+            {phase === 'reveal' && (
+              <div className="card">
+                <h4 style={{ fontSize: 11, letterSpacing: 1.2, color: 'var(--green)', marginBottom: 12 }}>
+                  LEVERAGE SIGNALS — TICK THE ONES YOU NOTICED
+                </h4>
+                {FLAGS.map((f) => (
+                  <label key={f} className={`flag-item ${ticked.includes(f) ? 'ticked' : ''}`} style={ticked.includes(f) ? { borderColor: 'var(--green)', background: 'var(--green-soft)' } : {}}>
+                    <input type="checkbox" checked={ticked.includes(f)} onChange={() => toggleFlag(f)} />
+                    <span>✨ {f}</span>
+                  </label>
+                ))}
+                <button className="btn btn-primary big-cta" style={{ background: 'var(--purple)', borderColor: 'var(--purple)', marginTop: 10 }} onClick={() => setPhase('persona')}>
+                  View Report →
+                </button>
+              </div>
+            )}
+          </div>
+        </>
+      )}
+    </div>
+  )
+}
+
+function Persona({ onNavigate }) {
+  return (
+    <div className="persona-quad">
+      <h2 style={{ fontSize: 18 }}>Where you sit</h2>
+      <p style={{ fontSize: 12.5, color: 'var(--ink-soft)', marginTop: 6 }}>
+        Based on your responses: speed of adoption vs. depth of judgment.
+      </p>
+      <div className="persona-grid">
+        <div className="pq-cell" style={{ background: '#e2f6ee', color: '#0d5c40' }}><span>🦅</span>Eagle</div>
+        <div className="pq-cell" style={{ background: '#fdf3d7', color: '#7a5205' }}><span>🐿️</span>Squirrel</div>
+        <div className="pq-cell" style={{ background: '#e7ebfd', color: '#2f3d8f' }}><span>🐢</span>Tortoise</div>
+        <div className="pq-cell" style={{ background: '#fdeaec', color: '#7c1e26' }}><span>🦁</span>Lion</div>
+        <div className="pq-you" style={{ top: '38%', right: '12%' }}>YOU</div>
+      </div>
+      <div className="pq-axis"><span>Cautious adoption</span><span>Bold adoption</span></div>
+
+      <div className="persona-result">
+        <b>⚡ The Quick Adopter (you)</b>
+        <p style={{ marginTop: 8, color: 'var(--ink-soft)' }}>
+          You reach for AI fast — great for leverage, risky without a data check. You picked the right tool
+          and spotted 3 of 4 leverage signals. Pair your speed with a two-second classification check and
+          you move into Strategic Operator territory.
+        </p>
+        <p style={{ marginTop: 8, fontSize: 11.5, color: 'var(--ink-soft)' }}>
+          Other personas: The Confident Builder · The Strategic Operator · The Steady Learner
+        </p>
+      </div>
+      <div style={{ marginTop: 18, display: 'flex', gap: 10, justifyContent: 'center' }}>
+        <button className="btn" onClick={() => onNavigate('ampliverse')}>Back to the Ampliverse</button>
+        <button className="btn btn-primary" onClick={() => onNavigate('pulse')}>See team impact in AI Pulse</button>
+      </div>
+    </div>
+  )
+}
+
+return CipherLetter;
+})();
+
+const Ampliverse = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+const TIERS = {
+  1: { name: 'FOUNDATIONS', color: '#4d7ee0', size: 20, radius: 15, startAngle: 8 },
+  2: { name: 'PRACTITIONER', color: '#35c3a9', size: 28, radius: 27, startAngle: 190 },
+  3: { name: 'ADVANCED', color: '#e2762d', size: 34, radius: 40, startAngle: 100 },
+}
+
+const APP_META = {
+  copilot: { name: 'Microsoft 365 Copilot', icon: '✨', accent: '#6b5ce0', theme: 'dark' },
+  teams: { name: 'Microsoft Teams', icon: '⧫', accent: '#6264a7', theme: 'dark' },
+  outlook: { name: 'Outlook', icon: '✉', accent: '#0a66c2', theme: 'light' },
+  word: { name: 'Word', icon: 'W', accent: '#2b579a', theme: 'light' },
+  excel: { name: 'Excel', icon: 'X', accent: '#217346', theme: 'light' },
+  powerpoint: { name: 'PowerPoint', icon: 'P', accent: '#c43e1c', theme: 'light' },
+}
+
+const MODULE_DEFS = [
+  // level 1 — foundations
+  { title: 'AI Fluency in 15 Minutes', short: 'AI FLUENCY', level: 1, target: 'cipher', done: false, app: 'copilot',
+    desc: 'A fast primer on where AI actually saves you time this week — no jargon, just the moves that matter.',
+    slides: [
+      { type: 'info', h: 'Where AI actually helps on client work', body: 'Forget the big transformation talk — the realistic win is smaller. AI is good at first drafts, second opinions, and busywork you already know how to do but would rather not: turning a call recap into a clean summary, restructuring a rough analysis into client-ready language, or getting a second pass on a section before it goes in a deliverable.' },
+      { type: 'info', h: 'Three tasks worth handing off today', body: '1. Turning a client call recap into a follow-up email.\n2. Summarizing a long thread before a status meeting.\n3. Rewriting a section in a different tone for a different audience — technical for the working team, plain-English for the steering committee.' },
+      { type: 'choice', q: 'AI summarizes a client\'s Q3 revenue growth as "12%." The source document actually says "1.2%." What happened?', opts: ['The AI is being deliberately misleading', 'It confidently invented a number that looked plausible', 'The source document is wrong'], correct: 1, why: 'This is a hallucination — the model produced a fluent, confident-sounding number that simply wasn\'t in the source. It happens more with numbers than almost anything else. Always trace figures back to source before they go in a deliverable.' },
+      { type: 'input', prompt: 'Try it: think of one recurring task on your desk right now (a status update, a recap, a first-pass draft). Write the one-sentence version of what you\'d hand to AI.', placeholder: 'e.g. "Turn my rough call notes into a 3-bullet recap for the team channel."' },
+      { type: 'wrap', h: 'A 2-minute gut check before you send', body: 'Does every number trace back to a source you can point to? Does every name and title match the file? Would you be comfortable if the client asked "how did you get this?" If yes to all three, you\'re good to send.' },
+    ] },
+  { title: 'Context Engineering Basics', short: 'CONTEXT ENG.', level: 1, target: 'cipher', done: false, app: 'copilot',
+    desc: 'Give AI the right background and it gives you the right answer. The three things every good prompt needs.',
+    slides: [
+      { type: 'info', h: 'Why "write me an email" falls flat', body: 'A model with no context guesses at tone, audience, and goal — and guesses wrong more often than not. The fix isn\'t a magic phrase, it\'s giving it what a new colleague would need to do the task well.' },
+      { type: 'info', h: 'The three things every prompt needs', body: 'Role — who should the AI act as?\nContext — what does it need to know that isn\'t obvious?\nFormat — what should the output look like when it\'s done?' },
+      { type: 'info', h: 'Before / after', body: 'Before: "Summarize this for the partner."\n\nAfter: "You\'re drafting a two-paragraph pre-read for the engagement partner ahead of a 3pm client call. Summarize the attached workpaper in plain English, lead with the one finding that changes our recommendation, and flag anything that still needs client confirmation."' },
+      { type: 'input', prompt: 'Try it: take a request you\'d normally type in one line ("summarize this," "draft a reply") and rewrite it with role + context + format.', placeholder: 'e.g. "Act as a reviewer prepping the manager for a client call. Summarize in 3 bullets, lead with risk items."' },
+      { type: 'choice', q: 'You\'ve set role and context once at the start of a long chat. Do you need to repeat it in every follow-up message?', opts: ['Yes, always', 'No — the model keeps it for that conversation', 'Only if you switch tools or open a new chat'], correct: 2, why: 'Context persists within a single conversation, but rarely carries over automatically to a new chat or a different tool — restate the essentials when you switch.' },
+      { type: 'wrap', h: 'Context is the highest-leverage minute you\'ll spend', body: 'A well-specified prompt takes 20 extra seconds to write and routinely saves several rounds of "no, not like that." It\'s the single biggest lever on output quality.' },
+    ] },
+  { title: 'Tap Card Learning', short: 'TAP CARDS', level: 1, target: 'cipher', done: false, app: 'copilot',
+    desc: 'Six fast AI habits — answer a quick check on each before it reveals why.',
+    slides: [
+      { type: 'info', h: 'Six-card sprint: fast AI habits', body: 'Six quick rounds. Each takes about 30 seconds. Answer first, then see why.' },
+      { type: 'choice', q: 'A colleague asks AI a vague one-line question and gets a vague answer. What\'s the fix?', opts: ['Try a different AI tool', 'Add one constraint — audience, length, or format', 'Ask the exact same question twice'], correct: 1, why: 'Vague prompt in, vague answer out. One added constraint — who it\'s for, how long, what shape — usually fixes it immediately.' },
+      { type: 'choice', q: 'True or false: most AI tools remember everything from your last conversation automatically.', opts: ['True', 'False — memory varies a lot by tool'], correct: 1, why: 'Some tools remember across sessions, some forget after each message. Check before you assume continuity.' },
+      { type: 'choice', q: 'AI states a specific fact very confidently. How much should that confidence tell you about accuracy?', opts: ['A lot — confident tone means it checked', 'Almost nothing — confidence and accuracy aren\'t linked', 'Only trust it if it says "I\'m sure"'], correct: 1, why: 'This is the single most important habit to unlearn: fluent, confident tone is not a signal of accuracy. Verify separately.' },
+      { type: 'choice', q: 'You need to get data from a PDF or a screenshot of a table into AI. What\'s the fastest path?', opts: ['Retype the whole table by hand', 'Upload or paste it directly — most tools can read it', 'It can\'t be done'], correct: 1, why: 'Most tools can read a pasted screenshot or uploaded PDF directly — often much faster than retyping a table by hand.' },
+      { type: 'input', prompt: 'Quick practice: describe one document you have open right now and one question you\'d ask AI about it.', placeholder: 'e.g. "Budget tracker — does any category run more than 15% over plan?"' },
+      { type: 'wrap', h: 'Nice work', body: 'Six fast habits down. The pattern behind all of them: be specific, verify facts, and don\'t assume memory or context you haven\'t confirmed.' },
+    ] },
+  { title: 'Prompt Patterns 101', short: 'PROMPT PATTERNS', level: 1, target: 'cipher', done: true, app: 'copilot',
+    desc: 'Role, context, format, examples, constraints: the five patterns behind reliable outputs.',
+    slides: [
+      { type: 'info', h: 'Five patterns behind reliable prompts', body: 'Role, Context, Format, Examples, Constraints — most reliable outputs stack two or more of these together.' },
+      { type: 'choice', q: '"Act as a skeptical compliance reviewer" is an example of which pattern?', opts: ['Role', 'Format', 'Example'], correct: 0, why: 'This sets Role — it changes tone and scrutiny more than almost any other single instruction.' },
+      { type: 'choice', q: '"Return exactly 3 bullets, each under 15 words" is an example of which pattern?', opts: ['Context', 'Format', 'Role'], correct: 1, why: 'This is Format — the shape and constraints of the output, independent of what it actually says.' },
+      { type: 'choice', q: '"Don\'t invent statistics — flag anything you\'re unsure of instead" is an example of which pattern?', opts: ['Constraint', 'Example', 'Context'], correct: 0, why: 'Telling the model what NOT to do is a Constraint — it prevents common failure modes just as reliably as positive instructions.' },
+      { type: 'input', prompt: 'Try it: write a one-line prompt for a real task on your desk that stacks at least two patterns (Role + Format, or Context + Constraint).', placeholder: 'e.g. "Act as a reviewer. Return 3 gaps, under 15 words each. Do not suggest legal conclusions."' },
+      { type: 'wrap', h: 'Stack them for best results', body: 'Full example: "Act as a compliance reviewer [Role]. This is a draft client memo about a new regulation [Context]. Return 3 bullet points on gaps, under 15 words each [Format]. Do not suggest legal conclusions — flag for legal review instead [Constraint]."' },
+    ] },
+  { title: 'Tokens, Context & Cost: The Basics', short: 'TOKENS & COST', level: 1, target: 'cipher', done: false, app: 'copilot',
+    desc: 'What a token actually is, why context windows have limits, and how usage translates to cost.',
+    slides: [
+      { type: 'info', h: 'What a token actually is', body: 'A token is roughly ¾ of a word. Models read and are billed by tokens, not words or characters — so a 1,000-word document is closer to 1,350 tokens.' },
+      { type: 'calculator' },
+      { type: 'choice', q: 'You\'re about to paste an entire 20,000-word engagement transcript into a single prompt on a model with a small context window. What\'s the risk?', opts: ['Nothing, longer is always fine', 'It may silently drop or deprioritize earlier content once the window fills up', 'It will just take longer to respond'], correct: 1, why: 'Once a prompt exceeds the context window, older content can get truncated or deprioritized — sometimes without any warning. Split long documents into sections instead.' },
+      { type: 'input', prompt: 'Estimate: think of a document you regularly paste into an AI tool. Roughly how many words is it, and would it comfortably fit a 128k-token window?', placeholder: 'e.g. "Weekly status report, ~1,000 words — comfortably fits."' },
+      { type: 'wrap', h: 'Rule of thumb', body: 'Short, frequent tasks (emails, recaps) barely register on cost or context. Long documents (data rooms, full transcripts) are where token limits and cost start to matter — plan accordingly.' },
+    ] },
+  { title: 'Meeting Notes in Minutes', short: 'MEETING NOTES', level: 1, target: 'cipher', done: false, app: 'teams',
+    desc: 'From raw transcript to a decisions-and-actions summary — with a reusable template.',
+    slides: [
+      { type: 'info', h: 'From raw notes to a clean recap', body: 'Paste your rough notes in as-is — don\'t clean them up first. Ask for three sections: Decisions, Action items (with owner), Open questions.' },
+      { type: 'info', h: 'Example: raw vs. cleaned', body: 'Raw: "yeah so I think we said Q3 numbers looked ok but ops flagged the vendor contract thing again, sarah\'s following up, need approval by friday I think? someone check with legal"\n\nCleaned — Decisions: Q3 numbers approved as presented. Action items: Sarah — follow up on vendor contract issue, due Friday. Open questions: Confirm with Legal whether the vendor contract needs review before Friday\'s deadline.' },
+      { type: 'choice', q: 'The cleaned output lists "Sarah" as an action owner. What should you do before sending it?', opts: ['Nothing, it\'s clearly stated', 'Verify the name and spelling against the attendee list', 'Remove the owner to be safe'], correct: 1, why: 'Names and owners are exactly the kind of detail that\'s easy to get subtly wrong. A quick check against the invite list takes seconds and prevents an awkward correction email.' },
+      { type: 'input', prompt: 'Try it: type 2-3 rough, messy sentences the way you\'d actually jot down real meeting notes.', placeholder: 'e.g. "budget looks tight for q4, mike said he\'d check with finance, follow up next week"' },
+      { type: 'wrap', h: 'Save it as a template', body: 'Once the prompt works, save it. Next week\'s notes take 90 seconds instead of 10 minutes.' },
+    ] },
+  // level 2 — practitioner
+  { title: 'Automate Your Monday', short: 'AUTOMATE MONDAY', level: 2, target: 'vendor', done: true, app: 'outlook',
+    desc: 'Hand your recurring Monday chores to an agent — inbox triage, status drafts, meeting prep.',
+    slides: [
+      { type: 'info', h: 'Not everything on Monday needs a human', body: 'List the 3 tasks you do every single Monday morning without thinking. For each, ask: does this need judgment, or is it just pattern-following?' },
+      { type: 'choice', q: 'Drafting your weekly status email from your calendar and last week\'s notes is a good candidate for automation. What should you never skip?', opts: ['Reviewing it before sending', 'Sending it immediately to save time', 'Copying last week\'s email exactly'], correct: 0, why: 'Automation drafts, you approve. Auto-sending anything client- or team-facing without a review step is how small errors become visible mistakes.' },
+      { type: 'input', prompt: 'List one Monday task you do on autopilot that could become a standing prompt.', placeholder: 'e.g. "Triage my inbox into: needs reply today / can wait / FYI only."' },
+      { type: 'choice', q: 'Which of these should stay a judgment call, not an automated draft?', opts: ['A first-pass status update', 'A reply that requires saying no to a client request', 'Sorting FYI emails into a folder'], correct: 1, why: 'Anything involving a real decision — pushing back, declining, negotiating — needs your judgment. Automation is for the pattern-following parts around it.' },
+      { type: 'wrap', h: 'Keep the loop tight', body: 'Automate the draft, keep the send button. That\'s the whole trick.' },
+    ] },
+  { title: 'From Idea to Draft in Five Minutes', short: 'IDEA → DRAFT', level: 2, target: 'cipher', done: false, app: 'word',
+    desc: 'Brainstorm, structure, and write a first draft with AI as your thinking partner, not your ghostwriter.',
+    slides: [
+      { type: 'info', h: 'Start messy, on purpose', body: 'Dump half-formed thoughts into the chat before trying to write a clean prompt. Let AI help you find the structure — that\'s often the hardest part, not the sentences.' },
+      { type: 'info', h: 'Worked example', body: 'Rough idea: "I think we should tell the client to delay the system migration."\n\nFirst-draft structure: Recommendation (delay by one quarter) → Rationale (3 points: data readiness, resourcing, vendor timeline) → Risks of delaying further → Next steps & owners.' },
+      { type: 'choice', q: 'What should you ask AI for first — the outline or the full draft?', opts: ['Full draft, edit down from there', 'Outline first, draft second', 'Doesn\'t matter, same result'], correct: 1, why: 'Getting the shape right first — sections, in order — is far cheaper to fix than a full draft that\'s structured wrong.' },
+      { type: 'input', prompt: 'Try it: type one half-formed idea you actually have right now, the way you\'d say it out loud.', placeholder: 'e.g. "I think we\'re underselling the risk section in the deck"' },
+      { type: 'wrap', h: 'Keep your voice', body: 'Use the AI draft as scaffolding, then rewrite the opening and closing lines yourself. Those are what readers remember — and where "sounding like you" matters most.' },
+    ] },
+  { title: 'AI-Assisted Slide Design', short: 'SLIDE DESIGN', level: 2, target: 'cipher', done: false, app: 'powerpoint',
+    desc: 'Stop rebuilding formatting by hand — apply the firm\'s template and brand style automatically, then review.',
+    slides: [
+      { type: 'info', h: 'Stop rebuilding formatting from scratch', body: 'Every deck that goes to a client is supposed to use the firm\'s approved template — brand colors, fonts, title layout, footer, confidentiality line. In practice, half the team rebuilds this by hand every time. Copilot in PowerPoint can apply the template automatically: point it at the firm\'s template file, and it re-lays your rough content into the approved master slides.' },
+      { type: 'template' },
+      { type: 'info', h: 'What it can (and can\'t) fix for you', body: 'It can: reflow your content into the approved master layouts, apply brand colors/fonts, add the standard title slide, section dividers, footer, page numbers, and confidentiality line.\n\nIt can\'t: judge whether the content itself is client-ready, or pick which master layout best fits a dense table vs. a single chart — that\'s still your call.' },
+      { type: 'choice', q: 'You have a working deck built in default PowerPoint formatting that now needs to go to the client using the firm\'s approved template. What\'s the right first move?', opts: ['Manually rebuild every slide in the template from scratch', 'Apply the template via Copilot, then review each slide before sending', 'Send it as-is — content matters more than formatting'], correct: 1, why: 'Letting Copilot re-lay the content into the approved template saves the rebuild time, but "applied" isn\'t the same as "reviewed" — always check the result before it goes out.' },
+      { type: 'input', prompt: 'Try it: describe one deck sitting in your drafts right now that\'s still in default formatting and would need the corporate template applied.', placeholder: 'e.g. "Internal status deck — still has the default PowerPoint theme, needs to go out to the client Friday."' },
+      { type: 'choice', q: 'After the template is auto-applied, what should you specifically double-check?', opts: ['Nothing — trust the template engine', 'Logo placement, dates, and the confidentiality footer on every slide, not just the first one', 'Only the title slide'], correct: 1, why: 'Auto-applied templates usually nail the first slide and then drift — a stray old logo, wrong date, or missing footer two slides in is the most common miss. Scan the whole deck, not just the opener.' },
+      { type: 'wrap', h: 'Template automation is a first pass, not final QA', body: 'It saves the hour you\'d spend manually rebuilding slide masters. It doesn\'t replace the two minutes you spend actually looking at what came out the other side.' },
+    ] },
+  { title: 'Reading a Spreadsheet Out Loud', short: 'SPREADSHEETS', level: 2, target: 'vendor', done: false, app: 'excel',
+    desc: 'Paste in a dataset and get a plain-English summary, three questions worth asking, and one chart worth building.',
+    slides: [
+      { type: 'info', h: 'Scenario', body: 'You\'ve been handed a budget variance tracker: 40 rows, actual vs. budget by cost center, for a client\'s Q3 close.' },
+      { type: 'choice', q: 'What should you ask for first?', opts: ['A full rewrite of the raw data', 'A plain-English summary of the biggest patterns', 'A chart with no explanation'], correct: 1, why: 'Start with the summary — it tells you what\'s worth digging into before you invest in a specific chart or cut of the data.' },
+      { type: 'choice', q: 'The summary states a total that looks off. What\'s the right move?', opts: ['Trust it, it did the math', 'Recalculate the total yourself before using it', 'Ask a different question instead'], correct: 1, why: 'AI can misread rows or misparse formatting. Always spot-check totals and key figures against the source data.' },
+      { type: 'choice', q: 'You want it to flag anomalies in the tracker. What\'s the better ask?', opts: ['"Check for problems"', '"List every cost center more than 15% over or under budget"', '"Is this data good?"'], correct: 1, why: 'Specific, measurable asks get you a usable list. Vague ones get you a vague, hard-to-act-on answer.' },
+      { type: 'input', prompt: 'Try it: describe one spreadsheet you work with regularly and one specific question you\'d ask about it.', placeholder: 'e.g. "Utilization tracker — which team members are under 70% billable this month?"' },
+      { type: 'wrap', h: 'One chart worth building', body: 'End with: "What\'s the one chart that would make this pattern obvious to someone who hasn\'t seen the data?" That\'s usually the chart worth actually building.' },
+    ] },
+  { title: 'Which AI Tool for Which Task', short: 'TOOL PICKER', level: 2, target: 'vendor', done: false, app: 'copilot',
+    desc: 'Claude, Copilot, or Gemini? A side-by-side matrix mapping tools to task types.',
+    slides: [
+      { type: 'info', h: 'No single tool wins everything', body: 'Here\'s a rough map of where each tool tends to be strongest for day-to-day work.' },
+      { type: 'matrix', cols: ['Claude', 'Copilot', 'Gemini'], rows: [
+        { label: 'Long-form writing', cells: ['best', 'ok', 'ok'] },
+        { label: 'In-document editing (Office)', cells: ['ok', 'best', 'ok'] },
+        { label: 'Data / spreadsheet analysis', cells: ['ok', 'ok', 'best'] },
+        { label: 'Code generation', cells: ['best', 'best', 'ok'] },
+        { label: 'Search-grounded answers', cells: ['ok', 'ok', 'best'] },
+        { label: 'Meeting notes inside Teams', cells: ['no', 'best', 'no'] },
+      ] },
+      { type: 'choice', q: 'You need to redline a specific clause directly inside a Word document during a live client call. Best fit?', opts: ['Claude', 'Copilot', 'Gemini'], correct: 1, why: 'In-document editing inside Office tools is where Copilot has the tightest integration — fewer copy-paste round trips.' },
+      { type: 'input', prompt: 'Which tool do you reach for most often, and for what task? Be honest — is it actually the best fit per the matrix?', placeholder: 'e.g. "I default to whichever tab is already open, mostly for drafting."' },
+      { type: 'wrap', h: 'Default to task, not habit', body: 'The biggest efficiency loss isn\'t picking the "wrong" tool — it\'s always reaching for whichever one is already open. Match the tool to the task.' },
+    ] },
+  { title: 'Chaining Prompts: Multi-Step Workflows', short: 'PROMPT CHAINS', level: 2, target: 'cipher', done: false, app: 'word',
+    desc: 'Turn one question into a pipeline — draft, critique, refine — without ever leaving the chat.',
+    slides: [
+      { type: 'info', h: 'One prompt rarely gets the best answer', body: 'The strongest outputs usually come from a short back-and-forth: draft, then a critique pass, then a refine pass — each one a separate, focused ask.' },
+      { type: 'info', h: 'Applied to a client risk memo', body: 'Step 1: "Draft a first version of the risk section."\nStep 2: "Now critique that draft as a skeptical partner — what would they flag?"\nStep 3: "Rewrite it addressing those critiques directly."' },
+      { type: 'choice', q: 'After 4 refine rounds you\'re still not happy with the output. What\'s most likely the problem?', opts: ['The model itself is the issue', 'The prompt is missing context, not the model', 'You should just accept round 4'], correct: 1, why: 'If refine rounds stop improving things, go back and check whether the original prompt gave enough context — that\'s the more common culprit than model capability.' },
+      { type: 'input', prompt: 'Try it: write the "draft" step of a chain for something you need this week.', placeholder: 'e.g. "Draft a first version of the client status email covering scope, timeline, and one open risk."' },
+      { type: 'wrap', h: 'Two or three rounds is usually enough', body: 'More than that and you\'re usually polishing, not fixing. Know when to stop.' },
+    ] },
+  // level 3 — advanced
+  { title: 'Picking Fast vs. Frontier Models', short: 'FAST vs FRONTIER', level: 3, target: 'cipher', done: false, app: 'copilot',
+    desc: 'Not every task needs the biggest model. When a fast, cheap model beats a frontier one — and when it does not.',
+    slides: [
+      { type: 'info', h: 'Not every task needs the biggest model', body: 'Every major model family ships a fast, cheap tier and a frontier tier: Claude Haiku vs. Claude Opus, GPT-4o mini vs. GPT-4o (or a reasoning model like o1), Gemini Flash vs. Gemini Pro. Fast tiers are excellent at high-volume, low-ambiguity work. Frontier tiers earn their extra cost and latency on nuanced, high-stakes reasoning.' },
+      { type: 'choice', q: 'You need to classify 500 client expense receipts by category. Which fits best?', opts: ['Claude Haiku or GPT-4o mini', 'Claude Opus or a reasoning model like o1', 'It doesn\'t matter'], correct: 0, why: 'High-volume, low-ambiguity tasks are exactly where a fast tier like Claude Haiku or GPT-4o mini shines — same quality on this kind of task, a fraction of the cost and latency of the frontier tier.' },
+      { type: 'choice', q: 'You\'re drafting a sensitive client-facing strategy memo. Which fits best?', opts: ['A fast tier like Gemini Flash', 'A frontier model like Claude Opus or GPT-4o', 'Whichever loads first'], correct: 1, why: 'High-stakes, nuanced reasoning tasks are worth the extra cost and latency of a frontier-tier model.' },
+      { type: 'choice', q: 'You have 200 contracts to triage before a deeper legal review. What\'s the efficient sequence?', opts: ['A frontier model reads all 200 in full', 'A fast tier (e.g. Claude Haiku) does first-pass triage, a frontier model (e.g. Claude Opus) reviews the flagged subset', 'Skip the fast tier entirely'], correct: 1, why: 'Layering — fast tier for triage, frontier tier for the flagged subset — gets you both speed and depth without paying frontier-model cost on every document.' },
+      { type: 'input', prompt: 'Think of a task on your plate. Which would you reach for: a fast tier (Claude Haiku / GPT-4o mini / Gemini Flash), a frontier tier (Claude Opus / GPT-4o / Gemini Pro), or a layered combination of both?', placeholder: 'e.g. "First-pass invoice categorization — Claude Haiku, no question."' },
+      { type: 'wrap', h: 'Let quality, not habit, decide', body: 'Model names and tiers change fast — what matters is the framework: high-volume and low-ambiguity leans fast tier, high-stakes and nuanced leans frontier tier. Let observed quality on your actual task drive the choice, not preference or what a colleague uses.' },
+    ] },
+  { title: 'Delegating a Research Brief', short: 'RESEARCH BRIEF', level: 3, target: 'vendor', done: false, app: 'copilot',
+    desc: 'Hand a research question to an agent, review its sources, and know when to trust the summary.',
+    slides: [
+      { type: 'info', h: 'Frame it narrowly', body: '"Top 3 competitors\' pricing changes in the last 6 months" beats "tell me about the market" every time. Narrow questions get useful, checkable answers.' },
+      { type: 'info', h: 'Example brief', body: 'A client is considering entering a new regional market. Brief: "Identify the 3 largest incumbents in [region] by market share, their pricing model, and any pricing changes in the last 12 months. Cite sources inline."' },
+      { type: 'choice', q: 'The agent returns a brief with confident figures and no inline citations. What now?', opts: ['Use it as-is, it sounds thorough', 'Ask for inline sources and open at least two yourself', 'Reject the whole brief'], correct: 1, why: 'Confident and cited are different things. Always push for inline sources, then verify a couple yourself before any figure goes in client work.' },
+      { type: 'input', prompt: 'Write one narrowly-framed research question for something you actually need answered this month.', placeholder: 'e.g. "What did our top 2 competitors announce in Q2 earnings calls about this segment?"' },
+      { type: 'wrap', h: 'Briefing document, not deliverable', body: 'Treat agent research as a starting briefing — not a finished, citable deliverable. It still needs your judgment layered on top.' },
+    ] },
+  { title: 'Shadow AI: The Incident', short: 'SHADOW AI', level: 3, target: 'cipher', done: true, app: 'teams',
+    desc: 'Interactive story about a well-meaning employee and a public chatbot — builds judgment, not just avoidance.',
+    slides: [
+      { type: 'info', h: 'The scenario', body: 'A colleague pastes a snippet of client source code into a public consumer chatbot to debug it faster. It works — the bug gets fixed in two minutes.' },
+      { type: 'choice', q: 'What\'s the core issue here?', opts: ['It\'s slower than asking a teammate', 'Client data may now be used to train a third-party model outside your org\'s control', 'The chatbot might give a wrong answer'], correct: 1, why: 'The risk isn\'t speed or accuracy — it\'s that sensitive client data left your organization\'s boundary with no visibility into how it\'s stored or used downstream.' },
+      { type: 'choice', q: 'What should have happened instead?', opts: ['Never use AI for debugging', 'Use an approved, sanctioned AI tool with proper data handling', 'Ask permission after the fact'], correct: 1, why: 'The goal isn\'t to avoid AI — it\'s to route the same task through a tool your org has actually vetted for data handling.' },
+      { type: 'choice', q: 'Which control would most reliably have prevented this?', opts: ['A stricter password policy', 'An approved enterprise AI tool with data protections, positioned as the easy default', 'A company-wide ban on all AI tools'], correct: 1, why: 'Bans push usage underground. The reliable fix is making the approved, safe option the easiest one to reach for.' },
+      { type: 'input', prompt: 'Your teammate says "it\'s fine, everyone does it." Type the one sentence you\'d actually say back.', placeholder: 'e.g. "Let\'s route this through the approved tool instead — same speed, no exposure."' },
+      { type: 'wrap', h: 'Judgment, not just avoidance', body: 'The goal of this module isn\'t "never use AI" — it\'s recognizing the specific moment where a task needs the approved door, not the fastest one.' },
+    ] },
+  { title: 'Prompt Lab', short: 'PROMPT LAB', level: 3, target: 'cipher', done: false, flagship: true, color: '#e2762d', moons: 1,
+    desc: 'Live inbox simulator — spot AI leverage moments across email, Teams, and docs.' },
+  { title: 'Agent Harbor', short: 'AGENT HARBOR', level: 3, target: 'vendor', done: false, flagship: true, color: '#8b3ff0', moons: 2,
+    desc: 'Agent-delegation tabletop — practice handing off multi-step work and judging which tools are worth adopting.' },
+]
+
+const MODULE_LOOKUP = Object.fromEntries(MODULE_DEFS.map((m) => [m.title, m]))
+
+function buildPlanets() {
+  const cx = 44, cy = 57
+  const byLevel = { 1: [], 2: [], 3: [] }
+  MODULE_DEFS.forEach((m) => byLevel[m.level].push(m))
+  const planets = []
+  Object.entries(byLevel).forEach(([lvl, items]) => {
+    const tier = TIERS[lvl]
+    items.forEach((m, i) => {
+      const angle = tier.startAngle + (360 / items.length) * i
+      const rad = (angle * Math.PI) / 180
+      const x = cx + tier.radius * Math.cos(rad)
+      const y = cy + tier.radius * 0.6 * Math.sin(rad)
+      planets.push({
+        id: m.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        name: m.title,
+        short: m.short,
+        level: m.level,
+        desc: m.desc,
+        target: m.target,
+        done: m.done,
+        flagship: !!m.flagship,
+        slides: m.slides,
+        app: m.app,
+        color: m.color || tier.color,
+        labelColor: m.color || tier.color,
+        size: m.flagship ? 46 : tier.size,
+        moons: m.moons || 0,
+        x: Math.max(6, Math.min(90, x)),
+        y: Math.max(18, Math.min(92, y)),
+      })
+    })
+  })
+  return planets
+}
+
+const PLANETS = [
+  ...buildPlanets(),
+  { id: 'mystery', name: '??? SECTOR', color: '#4d4f6b', x: 84, y: 20, size: 34, labelColor: '#6d7098',
+    locked: true, unlockAt: 1800, moons: 0 },
+]
+
+const LEVELS = [
+  { name: 'Recruit', min: 0 },
+  { name: 'Operator', min: 500 },
+  { name: 'Specialist', min: 1000 },
+  { name: 'Strategist', min: 1800 },
+  { name: 'Vanguard', min: 2800 },
+]
+
+function levelInfo(xp) {
+  let idx = 0
+  for (let i = 0; i < LEVELS.length; i++) if (xp >= LEVELS[i].min) idx = i
+  const cur = LEVELS[idx]
+  const next = LEVELS[idx + 1]
+  const pct = next ? Math.round(((xp - cur.min) / (next.min - cur.min)) * 100) : 100
+  return { idx, name: cur.name, next: next?.name, toNext: next ? next.min - xp : 0, pct }
+}
+
+const MISSIONS = [
+  { icon: '🧪', title: 'Complete the Prompt Lab simulation', xp: 150, status: 'active' },
+  { icon: '🤝', title: 'Clear the Agent Harbor tabletop', xp: 150, status: 'active' },
+  { icon: '📥', title: 'Finish Automate Your Monday', xp: 100, status: 'done' },
+  { icon: '🕵️', title: 'Survive Shadow AI: The Incident', xp: 100, status: 'done' },
+  { icon: '✍️', title: 'Read Prompt Patterns 101', xp: 80, status: 'done' },
+  { icon: '🧵', title: 'Try Context Engineering Basics', xp: 90, status: 'active' },
+  { icon: '📊', title: 'Run the spreadsheet insights lesson', xp: 90, status: 'active' },
+  { icon: '🪙', title: 'Learn Tokens, Context & Cost', xp: 90, status: 'active' },
+  { icon: '🎯', title: 'Complete all 15 Skill Builder lessons', xp: 200, status: 'active', progress: 20 },
+  { icon: '🔥', title: 'Hit a 5-day learning streak', xp: 50, status: 'active', progress: 60 },
+  { icon: '🌌', title: 'Visit every sector in the galaxy', xp: 120, status: 'locked' },
+]
+
+const ACHIEVEMENTS = [
+  { icon: '🚀', title: 'Early Adopter', desc: 'Joined in the first month', earned: true },
+  { icon: '🥇', title: 'First Contact', desc: 'Completed your first module', earned: true },
+  { icon: '🔥', title: 'On a Streak', desc: '5 days in a row', earned: true },
+  { icon: '🛡️', title: 'Threat Spotter', desc: 'Correctly flagged a risky AI tool', earned: true },
+  { icon: '🧠', title: 'Prompt Whisperer', desc: 'Complete the Prompt Lab', earned: false },
+  { icon: '🤖', title: 'Agent Wrangler', desc: 'Complete Agent Harbor', earned: false },
+  { icon: '🌌', title: 'Galaxy Explorer', desc: 'Visit every sector', earned: false },
+  { icon: '⭐', title: 'Top 10%', desc: 'Reach the top 10% of the leaderboard', earned: false },
+]
+
+const LEADERBOARD = [
+  { rank: 1, name: 'Priya Ramaswami', xp: 2450 },
+  { rank: 2, name: 'Daniel Osei', xp: 2100 },
+  { rank: 3, name: 'Freya Lindqvist', xp: 1890 },
+  { rank: 4, name: 'Marcus Webb', xp: 1600 },
+  { rank: 5, name: 'Caroline von Konigsmark', xp: 1200, you: true },
+  { rank: 6, name: 'Sofia Reyes', xp: 980 },
+  { rank: 7, name: 'Tariq Malik', xp: 740 },
+]
+
+const CRATER_SPOTS = [
+  { top: '18%', left: '60%', s: 20 },
+  { top: '58%', left: '20%', s: 15 },
+  { top: '70%', left: '58%', s: 13 },
+  { top: '35%', left: '36%', s: 11 },
+  { top: '14%', left: '28%', s: 14 },
+]
+
+const HUD_TABS = [
+  { id: 'map', icon: '🗺', label: 'GALAXY MAP' },
+  { id: 'missions', icon: '🎯', label: 'MISSIONS' },
+  { id: 'achievements', icon: '🏅', label: 'ACHIEVEMENTS' },
+  { id: 'leaderboard', icon: '📊', label: 'LEADERBOARD' },
+]
+
+const MODULES = [
+  { coll: 'PROMPT LAB', tag: 'TOOL', title: 'Prompt Lab', desc: 'Inbox simulator — spot AI leverage moments across email, Teams, and docs. Your responses reveal your AI persona.', updated: 'Jun 19', target: 'cipher' },
+  { coll: 'AGENT HARBOR', tag: 'SIMULATION', title: 'Agent Harbor', desc: 'Agent-delegation tabletop. Open this module to begin.', updated: 'Jun 11', target: 'vendor' },
+  { coll: 'SIMULATIONS', tag: 'TOOL', title: 'Prompt Lab', desc: 'Inbox simulator — spot AI leverage moments across email, Teams, and docs.', updated: 'Jun 19', target: 'cipher' },
+  { coll: 'SIMULATIONS', tag: 'SIMULATION', title: 'Agent Harbor', desc: 'Open this module to begin.', updated: 'Jun 11', target: 'vendor' },
+  { coll: 'SKILL BUILDERS', tag: 'LESSON', title: 'AI Fluency in 15 Minutes', desc: 'A fast primer on where AI actually saves you time this week — no jargon, just the moves that matter.', updated: 'Jun 23', target: 'cipher' },
+  { coll: 'SKILL BUILDERS', tag: 'LESSON', title: 'Context Engineering Basics', desc: 'Give AI the right background and it gives you the right answer. The three things every good prompt needs.', updated: 'Jun 24', target: 'cipher' },
+  { coll: 'SKILL BUILDERS', tag: 'LESSON', title: 'Chaining Prompts: Multi-Step Workflows', desc: 'Turn one question into a pipeline — draft, critique, refine — without ever leaving the chat.', updated: 'Jun 25', target: 'cipher' },
+  { coll: 'SKILL BUILDERS', tag: 'LESSON', title: 'From Idea to Draft in Five Minutes', desc: 'Brainstorm, structure, and write a first draft with AI as your thinking partner, not your ghostwriter.', updated: 'Jun 26', target: 'cipher' },
+  { coll: 'SKILL BUILDERS', tag: 'LESSON', title: 'AI-Assisted Slide Design', desc: 'Stop rebuilding formatting by hand — apply the firm\'s template and brand style automatically, then review.', updated: 'Jun 27', target: 'cipher' },
+  { coll: 'SKILL BUILDERS', tag: 'LESSON', title: 'Reading a Spreadsheet Out Loud', desc: 'Paste in a dataset and get a plain-English summary, three questions worth asking, and one chart worth building.', updated: 'Jun 28', target: 'vendor' },
+  { coll: 'SKILL BUILDERS', tag: 'LESSON', title: 'Which AI Tool for Which Task', desc: 'Claude, Copilot, or Gemini? A side-by-side matrix mapping tools to task types — writing, coding, analysis, meetings.', updated: 'Jun 29', target: 'vendor' },
+  { coll: 'SKILL BUILDERS', tag: 'TOOL', title: 'Delegating a Research Brief', desc: 'Hand a research question to an agent, review its sources, and know when to trust the summary.', updated: 'Jun 30', target: 'vendor' },
+  { coll: 'SKILL BUILDERS', tag: 'LESSON', title: 'Tokens, Context & Cost: The Basics', desc: 'What a token actually is, why context windows have limits, and how usage translates to cost.', updated: 'Jul 1', target: 'cipher' },
+  { coll: 'SKILL BUILDERS', tag: 'LESSON', title: 'Picking Fast vs. Frontier Models', desc: 'Not every task needs the biggest model. When a fast, cheap model beats a frontier one — and when it doesn’t.', updated: 'Jul 2', target: 'cipher' },
+  { coll: 'SKILL BUILDERS', tag: 'LESSON', title: 'Automate Your Monday', desc: 'Hand your recurring Monday chores to an agent — inbox triage, status drafts, meeting prep.', updated: 'Jun 22', target: 'vendor' },
+  { coll: 'SKILL BUILDERS', tag: 'LESSON', title: 'Prompt Patterns 101', desc: 'Role, context, format, examples: the four patterns behind reliable outputs.', updated: 'Jun 17', target: 'cipher' },
+  { coll: 'SKILL BUILDERS', tag: 'LESSON', title: 'Meeting Notes in Minutes', desc: 'From raw transcript to decisions-and-actions summary — with a reusable template.', updated: 'Jun 15', target: 'cipher' },
+  { coll: 'SKILL BUILDERS', tag: 'LESSON', title: 'Tap Card Learning', desc: 'Bite-sized AI-capability cards — tap through a stacked deck to pick up a new skill in under two minutes.', updated: 'Jun 22', target: 'cipher' },
+  { coll: 'SKILL BUILDERS', tag: 'LESSON', title: 'Shadow AI: The Incident', desc: 'Interactive story about a well-meaning employee and a public chatbot — builds judgment, not just avoidance.', updated: 'Jun 14', target: 'cipher' },
+]
+
+function Stars() {
+  const stars = useMemo(
+    () =>
+      Array.from({ length: 130 }, (_, i) => ({
+        left: (i * 37.3) % 100,
+        top: (i * 61.7) % 100,
+        size: 1 + ((i * 13) % 3),
+        opacity: 0.25 + ((i * 7) % 60) / 100,
+      })),
+    [],
+  )
+  const bigStars = useMemo(
+    () =>
+      Array.from({ length: 14 }, (_, i) => ({
+        left: (i * 53.7 + 6) % 100,
+        top: (i * 29.3 + 9) % 100,
+        size: 3 + ((i * 5) % 4),
+        delay: (i * 0.6) % 4,
+        dur: 2.6 + ((i * 3) % 3),
+      })),
+    [],
+  )
+  return (
+    <>
+      {stars.map((s, i) => (
+        <span key={i} className="star" style={{ left: `${s.left}%`, top: `${s.top}%`, width: s.size, height: s.size, opacity: s.opacity }} />
+      ))}
+      {bigStars.map((s, i) => (
+        <span
+          key={`big-${i}`}
+          className="star star-big"
+          style={{ left: `${s.left}%`, top: `${s.top}%`, width: s.size, height: s.size, animationDelay: `${s.delay}s`, animationDuration: `${s.dur}s` }}
+        />
+      ))}
+      <div className="galaxy-core-glow" />
+      <div className="galaxy-spiral" />
+      <div className="nebula nebula-a" />
+      <div className="nebula nebula-b" />
+      <div className="comet comet-a" />
+      <div className="comet comet-b" />
+      <div className="comet comet-c" />
+    </>
+  )
+}
+
+function RoboFace({ size = 52 }) {
+  return (
+    <svg className="robot-face" width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="roboHead" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#ffcf9e" />
+          <stop offset="100%" stopColor="#ff9d5c" />
+        </linearGradient>
+      </defs>
+      <line x1="50" y1="6" x2="50" y2="19" stroke="#ffb37a" strokeWidth="4" strokeLinecap="round" />
+      <circle className="robot-antenna-dot" cx="50" cy="7" r="6" fill="#ffe29a" />
+      <rect x="8" y="40" width="9" height="17" rx="4.5" fill="#d64550" />
+      <rect x="83" y="40" width="9" height="17" rx="4.5" fill="#d64550" />
+      <rect x="16" y="18" width="68" height="58" rx="22" fill="url(#roboHead)" />
+      <circle cx="30" cy="58" r="6" fill="#ff8a7a" opacity="0.55" />
+      <circle cx="70" cy="58" r="6" fill="#ff8a7a" opacity="0.55" />
+      <g className="robot-eyes">
+        <circle cx="37" cy="46" r="10.5" fill="#1a1330" />
+        <circle cx="63" cy="46" r="10.5" fill="#1a1330" />
+        <circle cx="40.5" cy="42.5" r="3.2" fill="#fff" />
+        <circle cx="66.5" cy="42.5" r="3.2" fill="#fff" />
+      </g>
+      <path d="M39 63 Q50 71 61 63" stroke="#1a1330" strokeWidth="3.4" fill="none" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+function Ampliverse({ onNavigate }) {
+  const [view, setView] = useState('home') // home | galaxy
+  const [collTab, setCollTab] = useState('SKILL BUILDERS')
+  const [selected, setSelected] = useState(null)
+  const [vendor, setVendor] = useState(false)
+  const [vendorOutcome, setVendorOutcome] = useState(null)
+  const [hudTab, setHudTab] = useState('map')
+  const [openModuleTitle, setOpenModuleTitle] = useState(null)
+  const openMod = openModuleTitle ? MODULE_LOOKUP[openModuleTitle] : null
+
+  const XP = 1200
+  const STREAK = 5
+  const lvl = levelInfo(XP)
+  const earnedCount = ACHIEVEMENTS.filter((a) => a.earned).length
+  const myRank = LEADERBOARD.find((r) => r.you)
+  const rankAbove = LEADERBOARD.find((r) => r.rank === myRank.rank - 1)
+
+  if (view === 'galaxy') {
+    const p = PLANETS.find((x) => x.id === selected)
+
+    const mascotLine = hudTab === 'missions'
+      ? `${MISSIONS.filter((m) => m.status === 'active').length} active missions in queue. Clear them before the sector resets.`
+      : hudTab === 'achievements'
+        ? `${earnedCount}/${ACHIEVEMENTS.length} badges collected. Keep going.`
+        : hudTab === 'leaderboard'
+          ? `You're ranked #${myRank.rank}. ${rankAbove.xp - myRank.xp} XP from #${rankAbove.rank}.`
+          : selected
+            ? p.locked
+              ? `Sector locked. Reach ${LEVELS.find((l) => l.min === p.unlockAt)?.name ?? 'a higher rank'} (${p.unlockAt} XP) to unlock.`
+              : p.done
+                ? `${p.name} — cleared. Nice work, come back any time to review it.`
+                : `${p.name} detected — ${TIERS[p.level]?.name ?? ''} tier. Clearance status: active.`
+            : 'Incoming signal from Agent Harbor. 2 missions queued for launch.'
+
+    return (
+      <div className="galaxy">
+        <Stars />
+        <div className="galaxy-hud">
+          <span className="hud-brand">⚡ AMPLIVERSE</span>
+          {HUD_TABS.map((t) => (
+            <span key={t.id} className={`hud-tab ${hudTab === t.id ? 'on' : ''}`} style={{ cursor: 'pointer' }} onClick={() => setHudTab(t.id)}>
+              {t.icon} {t.label}
+            </span>
+          ))}
+          <span className="hud-streak">🔥 {STREAK}-day streak</span>
+          <span className="hud-tab" style={{ cursor: 'pointer' }} onClick={() => setView('home')}>CAROLINE VON KONIGSMARK ▾</span>
+        </div>
+        <div className="galaxy-subbar">
+          <span className="galaxy-level-badge">LV {lvl.idx + 1} · {lvl.name}</span>
+          <div className="galaxy-xpbar"><div className="galaxy-xpbar-fill" style={{ width: `${lvl.pct}%` }} /></div>
+          <span className="galaxy-xp-label">✦ {XP.toLocaleString()} XP{lvl.next ? ` · ${lvl.toNext} to ${lvl.next}` : ' · MAX RANK'}</span>
+        </div>
+
+        {hudTab === 'map' && (
+          <>
+            <svg className="tier-orbits" viewBox="0 0 100 100" preserveAspectRatio="none">
+              {Object.values(TIERS).map((t) => (
+                <ellipse key={t.name} cx="44" cy="57" rx={t.radius} ry={t.radius * 0.6} fill="none" stroke={t.color} strokeOpacity="0.22" strokeWidth="0.18" strokeDasharray="0.9 1.1" />
+              ))}
+            </svg>
+            {PLANETS.map((pl, idx) => (
+              <div key={pl.id} className={`planet-wrap ${pl.locked ? 'locked' : ''}`} style={{ left: `${pl.x}%`, top: `${pl.y}%` }} onClick={() => setSelected(pl.id)}>
+                <div className="orbit-ring" style={{ width: pl.size + 34, height: pl.size + 34 }} />
+                {!pl.locked && pl.moons >= 2 && (
+                  <div className="planet-ring-belt" style={{ width: pl.size * 1.9, height: pl.size * 0.6, borderColor: `${pl.color}55` }} />
+                )}
+                <div className="planet" style={{
+                  width: pl.size, height: pl.size,
+                  background: pl.locked
+                    ? 'radial-gradient(circle at 32% 28%, #3a3c56, #0d0e1c 130%)'
+                    : `radial-gradient(circle at 32% 28%, ${pl.color}, #10091c 130%)`,
+                  boxShadow: pl.locked ? 'inset 0 0 18px rgba(0,0,0,0.6)' : `0 0 16px ${pl.color}aa, 0 0 42px ${pl.color}33`,
+                }}>
+                  {!pl.locked && Array.from({ length: 2 + (idx % 3) }).map((_, ci) => {
+                    const spot = CRATER_SPOTS[(ci + idx) % CRATER_SPOTS.length]
+                    const s = Math.max(4, Math.round(pl.size * (spot.s / 66)))
+                    return <span key={ci} className="crater" style={{ top: spot.top, left: spot.left, width: s, height: s }} />
+                  })}
+                  <div className="planet-shine" />
+                  {selected === pl.id && <div className="planet-ring" />}
+                  {Array.from({ length: pl.moons }).map((_, i) => {
+                    const spots = [{ top: '-10px', left: '-10px' }, { bottom: '-8px', right: '-6px' }]
+                    return <div key={i} className="moon" style={{ ...spots[i % spots.length], animationDelay: `${i * -2.5}s` }} />
+                  })}
+                  {pl.locked && <div className="planet-lock">🔒</div>}
+                  {!pl.locked && pl.done && <div className="planet-cleared">✓</div>}
+                </div>
+                <div className="planet-label" style={{ color: pl.locked ? '#565a7c' : pl.labelColor }}>{pl.short || pl.name}</div>
+                {!pl.locked && pl.level && (
+                  <div className="planet-level-dots">
+                    {[1, 2, 3].map((n) => (
+                      <span key={n} className={`plvl-dot ${n <= pl.level ? 'on' : ''}`} style={n <= pl.level ? { background: pl.color } : undefined} />
+                    ))}
+                  </div>
+                )}
+              </div>
+            ))}
+
+            {/* Earth easter egg */}
+            <div className="planet-wrap" style={{ right: '12%', top: '30%', cursor: 'default' }}>
+              <div className="orbit-ring" style={{ width: 154, height: 154 }} />
+              <div className="planet" style={{
+                width: 120, height: 120,
+                background: 'radial-gradient(circle at 35% 30%, #7ec8ff, #1c56c9 60%, #0a1e52 110%)',
+                boxShadow: '0 0 18px rgba(80,150,255,0.7), 0 0 46px rgba(80,150,255,0.35)',
+              }}>
+                <span className="crater" style={{ top: '30%', left: '55%', width: 26, height: 18, background: 'rgba(60,180,110,0.55)', borderRadius: '46% 54% 60% 40%' }} />
+                <span className="crater" style={{ top: '58%', left: '28%', width: 20, height: 15, background: 'rgba(60,180,110,0.5)', borderRadius: '50% 50% 40% 60%' }} />
+                <div className="planet-clouds" />
+                <div className="planet-shine" />
+              </div>
+            </div>
+
+            {p && (
+              <div className="mission-panel">
+                <h3>{p.name}</h3>
+                {p.locked ? (
+                  <div className="mission-locked">
+                    🔒 Locked sector<br />
+                    Reach <b>{LEVELS.find((l) => l.min === p.unlockAt)?.name}</b> ({p.unlockAt.toLocaleString()} XP) to unlock — you're {(p.unlockAt - XP).toLocaleString()} XP away.
+                  </div>
+                ) : (
+                  <>
+                    <span className="mission-tier-badge" style={{ color: p.color, borderColor: `${p.color}66` }}>{TIERS[p.level]?.name} · LV {p.level}</span>
+                    <p className="mission-desc">{p.desc}</p>
+                    {p.done && <div className="mission-done-tag">✓ Completed</div>}
+                    <button
+                      className="mission-launch"
+                      onClick={() =>
+                        p.flagship
+                          ? p.target === 'vendor' ? setVendor(true) : onNavigate('cipher')
+                          : setOpenModuleTitle(p.name)
+                      }
+                    >
+                      ⊕ {p.done ? 'REVISIT MISSION' : 'LAUNCH MISSION'} ›
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        {hudTab === 'missions' && (
+          <div className="panel-grid">
+            <div className="panel-head">
+              <h3>🎯 ACTIVE QUEST LOG</h3>
+              <span className="panel-sub">{MISSIONS.filter((m) => m.status === 'done').length}/{MISSIONS.length} complete</span>
+            </div>
+            {MISSIONS.map((m) => (
+              <div key={m.title} className={`quest-card ${m.status}`}>
+                <span className="quest-icon">{m.icon}</span>
+                <div className="quest-body">
+                  <div className="quest-title">{m.title}</div>
+                  {typeof m.progress === 'number' && m.status === 'active' && (
+                    <div className="quest-progress"><div className="quest-progress-fill" style={{ width: `${m.progress}%` }} /></div>
+                  )}
+                </div>
+                <span className="quest-xp">+{m.xp} XP</span>
+                <span className={`quest-status ${m.status}`}>
+                  {m.status === 'done' ? '✓ DONE' : m.status === 'locked' ? '🔒 LOCKED' : '● ACTIVE'}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {hudTab === 'achievements' && (
+          <div className="panel-grid">
+            <div className="panel-head">
+              <h3>🏅 ACHIEVEMENTS</h3>
+              <span className="panel-sub">{earnedCount}/{ACHIEVEMENTS.length} earned</span>
+            </div>
+            <div className="badge-grid">
+              {ACHIEVEMENTS.map((a) => (
+                <div key={a.title} className={`badge-card ${a.earned ? 'earned' : 'locked'}`}>
+                  <div className="badge-icon">{a.earned ? a.icon : '🔒'}</div>
+                  <div className="badge-title">{a.title}</div>
+                  <div className="badge-desc">{a.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {hudTab === 'leaderboard' && (
+          <div className="panel-grid">
+            <div className="panel-head">
+              <h3>📊 WEEKLY LEADERBOARD</h3>
+              <span className="panel-sub">Resets in 3 days</span>
+            </div>
+            {LEADERBOARD.map((r) => (
+              <div key={r.rank} className={`lb-row ${r.you ? 'you' : ''}`}>
+                <span className="lb-rank">{r.rank <= 3 ? ['🥇', '🥈', '🥉'][r.rank - 1] : `#${r.rank}`}</span>
+                <span className="lb-avatar">{r.name.split(' ').map((w) => w[0]).join('').slice(0, 2)}</span>
+                <span className="lb-name">{r.name}{r.you ? ' (you)' : ''}</span>
+                <div className="lb-bar"><div className="lb-bar-fill" style={{ width: `${Math.round((r.xp / LEADERBOARD[0].xp) * 100)}%` }} /></div>
+                <span className="lb-xp">{r.xp.toLocaleString()} XP</span>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <div className="mascot">
+          <div className="mascot-sprite"><RoboFace size={54} /></div>
+          <div className="mascot-say">
+            <b>» Amplify</b><br />
+            {mascotLine}
+          </div>
+        </div>
+
+        {vendor && (
+          <VendorSim
+            outcome={vendorOutcome}
+            setOutcome={setVendorOutcome}
+            close={() => { setVendor(false); setVendorOutcome(null) }}
+          />
+        )}
+        {openMod && <ModuleViewer module={openMod} close={() => setOpenModuleTitle(null)} />}
+      </div>
+    )
+  }
+
+  const shown = MODULES.filter((m) => m.coll === collTab)
+
+  return (
+    <div className="amplify-shell">
+      <aside className="amplify-side">
+        <div className="as-brand">✦ THE AMPLIVERSE</div>
+        <div className="sidebar-section">LEARNER</div>
+        <button className="amplify-item active">🏠 Home</button>
+        <button className="amplify-item">▦ Modules</button>
+        <div className="sidebar-section">QUICK LINKS</div>
+        <button className="amplify-item">💬 Ask Amplify</button>
+        <button className="amplify-item">🧰 Approved AI Tools</button>
+        <button className="amplify-item">🧱 Stacks 4 Hacks</button>
+        <div className="sidebar-section">ADMIN</div>
+        <button className="amplify-item" onClick={() => onNavigate('catalog')}>⚙ Admin</button>
+      </aside>
+
+      <div className="amplify-main">
+        <div className="galaxy-toggle">
+          <span style={{ fontSize: 11, color: 'var(--dark-muted)' }}>v2 classic</span>
+          <button className="btn btn-sm btn-primary" onClick={() => setView('galaxy')}>🪐 Switch to v3 Galaxy Map</button>
+        </div>
+
+        <div className="welcome-hero">
+          <h1>Welcome, Caroline von Konigsmark.</h1>
+          <p>Build your AI proficiency one module at a time. Pick something below to get started — your progress is saved as you go, and your submissions stay private to you and your admins.</p>
+        </div>
+
+        <div className="avail-head">
+          <h4>AVAILABLE MODULES</h4>
+          <span>{MODULES.length} available</span>
+        </div>
+        <div className="collection-tabs">
+          {['PROMPT LAB', 'AGENT HARBOR', 'SIMULATIONS', 'SKILL BUILDERS'].map((c) => (
+            <button key={c} className={`ctab ${collTab === c ? 'active' : ''}`} onClick={() => setCollTab(c)}>{c}</button>
+          ))}
+        </div>
+        <div className="mod-cards">
+          {shown.map((m, i) => (
+            <div className="mod-card" key={i}>
+              <span className="tag">{m.tag}</span>
+              <h4>{m.title}</h4>
+              <p>{m.desc}</p>
+              <div className="mod-card-foot">
+                <span>Updated {m.updated}</span>
+                <button
+                  onClick={() => {
+                    const md = MODULE_LOOKUP[m.title]
+                    if (md && md.slides) setOpenModuleTitle(m.title)
+                    else if (m.target === 'cipher') onNavigate('cipher')
+                    else setVendor(true)
+                  }}
+                >
+                  Open →
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {vendor && (
+          <VendorSim
+            outcome={vendorOutcome}
+            setOutcome={setVendorOutcome}
+            close={() => { setVendor(false); setVendorOutcome(null) }}
+          />
+        )}
+        {openMod && <ModuleViewer module={openMod} close={() => setOpenModuleTitle(null)} />}
+      </div>
+    </div>
+  )
+}
+
+function ModuleViewer({ module, close }) {
+  const slides = module.slides || []
+  const [idx, setIdx] = useState(0)
+  const [choiceAnswers, setChoiceAnswers] = useState({})
+  const [inputs, setInputs] = useState({})
+  const [done, setDone] = useState(!!module.done)
+  const tier = TIERS[module.level]
+  const slide = slides[idx] || {}
+  const isLast = idx === slides.length - 1
+  const appMeta = APP_META[module.app] || APP_META.copilot
+
+  const canNext =
+    slide.type === 'choice' ? choiceAnswers[idx] !== undefined :
+    slide.type === 'input' ? (inputs[idx] || '').trim().length > 0 :
+    true
+
+  return (
+    <div className="modal-back" onClick={close}>
+      <div
+        className={`mv-card mv-theme-${appMeta.theme} mv-app-${module.app || 'copilot'}`}
+        style={{ '--mv-accent': appMeta.accent }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="mv-chrome-bar" style={{ background: appMeta.accent }}>
+          <span className="mv-chrome-dots"><i /><i /><i /></span>
+          <span className="mv-chrome-app"><span className="mv-chrome-icon">{appMeta.icon}</span>{appMeta.name}</span>
+        </div>
+
+        <div className="mv-head">
+          <div>
+            <span className="mv-tier" style={{ color: tier?.color, borderColor: `${tier?.color}66` }}>{tier?.name} · LV {module.level}</span>
+            <h3>{module.title}</h3>
+          </div>
+          <button className="mv-close" onClick={close}>✕</button>
+        </div>
+
+        <div className="mv-progress">
+          {slides.map((_, i) => (
+            <span key={i} className={`mv-dot ${i === idx ? 'on' : ''} ${i < idx ? 'past' : ''}`} />
+          ))}
+          <span className="mv-progress-label">SLIDE {idx + 1} / {slides.length}</span>
+        </div>
+
+        <div className="mv-body">
+          {(slide.type === 'info' || slide.type === 'wrap') && <InfoSlide slide={slide} app={module.app} />}
+          {slide.type === 'choice' && <ChoiceSlide slide={slide} idx={idx} answers={choiceAnswers} setAnswers={setChoiceAnswers} />}
+          {slide.type === 'input' && <InputSlide slide={slide} idx={idx} values={inputs} setValues={setInputs} app={module.app} />}
+          {slide.type === 'matrix' && <MatrixSlide slide={slide} />}
+          {slide.type === 'calculator' && <CalculatorSlide />}
+          {slide.type === 'template' && <TemplateCompareSlide />}
+        </div>
+
+        <div className="mv-foot">
+          <button className="mv-nav-btn" disabled={idx === 0} onClick={() => setIdx((n) => Math.max(0, n - 1))}>‹ Back</button>
+          {!isLast ? (
+            <button
+              className="mv-next-btn"
+              disabled={!canNext}
+              onClick={() => setIdx((n) => Math.min(slides.length - 1, n + 1))}
+            >
+              Next ›
+            </button>
+          ) : done ? (
+            <span className="mv-status done">✓ Completed</span>
+          ) : (
+            <button className="mv-next-btn" onClick={() => setDone(true)}>Mark as complete ✓</button>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const APP_TAG = {
+  outlook: 'SUBJECT LINE', word: 'DOCUMENT', excel: 'CELL NOTE', powerpoint: 'SLIDE', teams: 'TEAMS CHAT', copilot: 'COPILOT CHAT',
+}
+
+function InfoSlide({ slide, app = 'copilot' }) {
+  const isChat = app === 'teams' || app === 'copilot'
+  return (
+    <div className={`mv-info mv-info-${app}`}>
+      <div className="mv-doc-label">{APP_TAG[app]}</div>
+      {isChat ? (
+        <div className="mv-chat-row">
+          <span className="mv-chat-avatar">{app === 'teams' ? '👤' : '✨'}</span>
+          <div className="mv-chat-bubble">
+            <div className="mv-chat-sender">{app === 'teams' ? 'Copilot in Teams' : 'Microsoft 365 Copilot'}</div>
+            <h4>{slide.h}</h4>
+            <p>{slide.body}</p>
+          </div>
+        </div>
+      ) : (
+        <div className="mv-info-surface">
+          <h4>{slide.h}</h4>
+          <p>{slide.body}</p>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function ChoiceSlide({ slide, idx, answers, setAnswers }) {
+  const picked = answers[idx]
+  return (
+    <div className="mv-quiz-q">
+      <div className="mv-quiz-question">{slide.q}</div>
+      {slide.opts.map((opt, oi) => {
+        const revealed = picked !== undefined
+        const isCorrect = oi === slide.correct
+        const cls = !revealed ? '' : isCorrect ? 'correct' : oi === picked ? 'wrong' : ''
+        return (
+          <button
+            key={oi}
+            className={`mv-quiz-opt ${cls}`}
+            disabled={revealed}
+            onClick={() => setAnswers((a) => ({ ...a, [idx]: oi }))}
+          >
+            {opt}
+          </button>
+        )
+      })}
+      {picked !== undefined && <div className="mv-quiz-why">{picked === slide.correct ? '✓ ' : '△ '}{slide.why}</div>}
+    </div>
+  )
+}
+
+function InputSlide({ slide, idx, values, setValues, app = 'copilot' }) {
+  const isChat = app === 'teams' || app === 'copilot'
+  return (
+    <div className={`mv-input-slide mv-input-${app}`}>
+      <div className="mv-doc-label">{isChat ? 'YOUR TURN — TYPE A MESSAGE' : 'ASK COPILOT'}</div>
+      <p className="mv-input-prompt">{slide.prompt}</p>
+      <div className="mv-input-dock">
+        <textarea
+          className="mv-input-box"
+          placeholder={slide.placeholder}
+          value={values[idx] || ''}
+          onChange={(e) => setValues((v) => ({ ...v, [idx]: e.target.value }))}
+          rows={isChat ? 3 : 4}
+        />
+        {isChat && <span className="mv-input-send">➤</span>}
+      </div>
+    </div>
+  )
+}
+
+function MatrixSlide({ slide }) {
+  const ICON = { best: '★ Best fit', ok: '● Works', no: '✕ Skip' }
+  return (
+    <table className="mv-matrix">
+      <thead>
+        <tr>
+          <th></th>
+          {slide.cols.map((c) => <th key={c}>{c}</th>)}
+        </tr>
+      </thead>
+      <tbody>
+        {slide.rows.map((r) => (
+          <tr key={r.label}>
+            <td className="mv-matrix-label">{r.label}</td>
+            {r.cells.map((cell, ci) => (
+              <td key={ci} className={`mv-matrix-cell mv-${cell}`}>{ICON[cell]}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  )
+}
+
+function CalculatorSlide() {
+  const [words, setWords] = useState(500)
+  const tokens = Math.round(words * 1.35)
+  const windowSize = 128000
+  const pct = Math.min(100, (tokens / windowSize) * 100)
+  const cost = ((tokens / 1_000_000) * 3).toFixed(4)
+  const presets = [
+    { label: 'Client email', words: 150 },
+    { label: 'Meeting recap', words: 500 },
+    { label: 'Status report', words: 1200 },
+    { label: 'Due diligence chapter', words: 5000 },
+    { label: 'Full engagement transcript', words: 20000 },
+  ]
+  return (
+    <div className="mv-calc">
+      <p className="mv-calc-intro">A token is roughly ¾ of a word — models read and bill by tokens, not words or characters. Try it:</p>
+      <div className="mv-calc-presets">
+        {presets.map((p) => (
+          <button key={p.label} className="mv-calc-preset" onClick={() => setWords(p.words)}>{p.label}</button>
+        ))}
+      </div>
+      <label className="mv-calc-label">Word count in your prompt + expected reply</label>
+      <input
+        type="range" min="50" max="20000" step="50" value={words}
+        onChange={(e) => setWords(Number(e.target.value))}
+        className="mv-calc-slider"
+      />
+      <div className="mv-calc-out">
+        <div className="mv-calc-stat"><b>{words.toLocaleString()}</b><small>words</small></div>
+        <div className="mv-calc-stat"><b>~{tokens.toLocaleString()}</b><small>tokens</small></div>
+        <div className="mv-calc-stat"><b>${cost}</b><small>est. cost*</small></div>
+      </div>
+      <div className="mv-calc-bar"><div className="mv-calc-bar-fill" style={{ width: `${pct}%` }} /></div>
+      <div className="mv-calc-bar-label">{pct.toFixed(1)}% of a 128k-token context window</div>
+      <p className="mv-calc-note">*Illustrative rate for a mid-tier model. Frontier models cost more per token; fast models cost less — see "Picking Fast vs. Frontier Models."</p>
+    </div>
+  )
+}
+
+function TemplateCompareSlide() {
+  return (
+    <div className="mv-tpl-compare">
+      <div className="mv-tpl-card">
+        <div className="mv-tpl-label">BEFORE — default formatting</div>
+        <div className="mv-tpl-mini">
+          <div className="mv-tpl-mini-title">Q3 Update</div>
+          <ul>
+            <li>Revenue up</li>
+            <li>New hires</li>
+            <li>Next steps</li>
+          </ul>
+        </div>
+      </div>
+      <div className="mv-tpl-arrow">✨</div>
+      <div className="mv-tpl-card">
+        <div className="mv-tpl-label">AFTER — firm template applied</div>
+        <div className="mv-tpl-mini mv-tpl-branded">
+          <div className="mv-tpl-mini-bar" />
+          <div className="mv-tpl-mini-title">Q3 Update</div>
+          <ul>
+            <li>Revenue up 8% QoQ</li>
+            <li>3 new hires onboarded</li>
+            <li>Next steps: finalize budget</li>
+          </ul>
+          <div className="mv-tpl-mini-footer">Confidential — Client XYZ · Q3 2026</div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function VendorSim({ outcome, setOutcome, close }) {
+  return (
+    <div className="modal-back" onClick={close}>
+      <div className="li-card" onClick={(e) => e.stopPropagation()}>
+        <div className="li-chrome">
+          <div className="li-logo">in</div>
+          <span style={{ fontSize: 12, color: '#8a8d92' }}>Search</span>
+          <span style={{ flex: 1 }} />
+          <span style={{ fontSize: 11.5, color: '#8a8d92' }}>Home · My Network · Messaging · Notifications</span>
+          <button onClick={close} style={{ border: 'none', background: '#0a66c2', color: '#fff', borderRadius: '50%', width: 22, height: 22, cursor: 'pointer' }}>✕</button>
+        </div>
+        <div className="li-body">
+          <div className="li-banner" />
+          <div className="li-profile">
+            <div className="li-avatar" style={{ background: 'linear-gradient(135deg, #7b5cf0, #3d5af1)' }}>NA</div>
+            <h3>NovaAI Tools</h3>
+            <div className="li-role">"SummarizeGPT — your meetings, summarized. 100% free forever."</div>
+            <div className="li-loc">Software company · 11–50 employees</div>
+            <div className="li-stats">
+              <span><b>2,4k</b> Followers</span>
+              <span><b>8</b> Posts</span>
+              <span><b>3 mo</b> Page age</span>
+            </div>
+          </div>
+          <div className="li-section">
+            <h4>Sponsored message</h4>
+            <p>
+              Hi Caroline! 👋 Loved your post about meeting overload. SummarizeGPT gives you instant AI
+              summaries of every meeting — completely free. Just connect your Google Drive and calendar and
+              we handle the rest. Setup takes 30 seconds — no IT approval needed!
+            </p>
+          </div>
+          <div className="li-section">
+            <h4>What to weigh</h4>
+            <ul style={{ paddingLeft: 18 }}>
+              <li>"Free forever" + full Drive access — what's the business model?</li>
+              <li>3-month-old company page, no security or privacy documentation</li>
+              <li>"No IT approval needed" is a pitch aimed at bypassing your tool-intake process</li>
+              <li>Your org already has an approved meeting-summary workflow</li>
+            </ul>
+          </div>
+        </div>
+        {outcome && (
+          <div className={`li-feedback ${outcome === 'report' ? 'good' : 'bad'}`}>
+            {outcome === 'report' ? (
+              <><b>✓ Best move.</b> Submitting the tool for vetting keeps the door open — if it's legit, IT can approve it for everyone; if not, you just prevented an org-wide Drive exposure. Enablement means more AI, through the right door.</>
+            ) : outcome === 'connect' ? (
+              <><b>✗ Risky.</b> Connecting Drive grants a 3-month-old unvetted vendor access to everything you can see. "Free forever" usually means your data is the product. Route it through tool intake instead — approval often takes days, not months.</>
+            ) : (
+              <><b>△ Understandable.</b> Ignoring it protects you, but colleagues got the same pitch. Submitting it for vetting (30 seconds) protects the whole org — and if the tool is good, everyone gets it properly.</>
+            )}
+          </div>
+        )}
+        <div className="li-actions">
+          <button className="li-btn primary" onClick={() => setOutcome('connect')}>Connect Google Drive</button>
+          <button className="li-btn ghost" onClick={() => setOutcome('ignore')}>Ignore</button>
+          <button className="li-btn report" onClick={() => setOutcome('report')}>Submit for Vetting</button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+return Ampliverse;
+})();
+
+const App = (() => {
+const { useState, useMemo, useEffect, useRef } = React;
+
+const PAGES = [
+  { id: 'landing', label: 'Overview' },
+  { id: 'pulse', label: 'AI Pulse' },
+  { id: 'catalog', label: 'Module Catalog' },
+  { id: 'orchestrator', label: 'Scenario Orchestrator' },
+  { id: 'command', label: 'Amplify Command Centre' },
+  { id: 'teams', label: 'Teams Delivery' },
+  { id: 'cipher', label: 'Prompt Lab' },
+  { id: 'ampliverse', label: 'The Ampliverse' },
+]
+
+function App() {
+  const [page, setPage] = useState('landing')
+  // shared state: campaign generated by the orchestrator flows into command centre + teams
+  const [campaign, setCampaign] = useState(null)
+
+  const darkPages = ['landing', 'ampliverse']
+
+  return (
+    <div className={`app ${darkPages.includes(page) ? 'app-dark' : 'app-light'}`}>
+      <nav className="topnav">
+        <div className="topnav-brand" onClick={() => setPage('landing')}>
+          <span className="brand-mark">AMP</span>
+          <span className="brand-name">Amplify</span>
+        </div>
+        <div className="topnav-links">
+          {PAGES.map((p) => (
+            <button
+              key={p.id}
+              className={`topnav-link ${page === p.id ? 'active' : ''}`}
+              onClick={() => setPage(p.id)}
+            >
+              {p.label}
+            </button>
+          ))}
+        </div>
+        <div className="topnav-user">
+          <span className="user-avatar">C</span>
+          <span className="user-name">Caroline von Konigsmark</span>
+          <span className="user-badge">ADMIN</span>
+        </div>
+      </nav>
+      <main className="page">
+        {page === 'landing' && <Landing onNavigate={setPage} />}
+        {page === 'pulse' && <SecurityPulse />}
+        {page === 'catalog' && <AdminCatalog onNavigate={setPage} />}
+        {page === 'orchestrator' && (
+          <Orchestrator onNavigate={setPage} campaign={campaign} setCampaign={setCampaign} />
+        )}
+        {page === 'command' && <CommandCentre onNavigate={setPage} campaign={campaign} />}
+        {page === 'teams' && <TeamsMock onNavigate={setPage} campaign={campaign} />}
+        {page === 'cipher' && <CipherLetter onNavigate={setPage} />}
+        {page === 'ampliverse' && <Ampliverse onNavigate={setPage} />}
+      </main>
+    </div>
+  )
+}
+
+return App;
+})();
+
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+</script>
+</body>
+</html>
